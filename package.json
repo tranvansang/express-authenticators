@@ -24,6 +24,8 @@
   "scripts": {
     "clean": "rm -rf lib",
     "build": "yarn tsc",
+    "test": "yarn jest",
+    "coverage": "yarn jest --coverage",
     "lint": "yarn tslint -p tsconfig.json && (yarn eslint index.ts src/**/*.ts || true)"
   },
   "dependencies": {
