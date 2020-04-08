@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    // Target latest version of ECMAScript.
+    "target": "ES5",
+    // Search under node_modules for non-relative imports.
+    "moduleResolution": "node",
+    // Process & infer types from .js files.
+    //    "allowJs": true,
+    "declaration": true,
+    "outDir": "lib",                          /* Redirect output structure to the directory. */
+    "rootDir": ".",                       /* Specify the root directory of input files. Use to control the output directory structure with --outDir. */
+    // Enable strictest settings like strictNullChecks & noImplicitAny.
+    "strict": true,
+    // Disallow features that require cross-file information for emit.
+    "isolatedModules": false,
+    // Import non-ES modules as default imports.
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "lib": ["esnext"],
+    "types": [
+      "node",
+      "jest"
+    ],
+    "module": "commonjs"
+  },
+  "include": [
+    "index.ts",
+    "node_modules/@types/express-session/index.d.ts"
+  ],
+  "exclude": ["src/**/*.test.ts"]
+}
