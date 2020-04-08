@@ -5,6 +5,7 @@ import {Request, Response} from 'express'
 import OAuthError from './OAuthError'
 import r3986 from 'r3986'
 import {IOAuthCommon} from '../OAuthCommon'
+import asyncMiddleware from 'middleware-async'
 
 type IHttpMethod = 'POST' | 'GET'
 const version = '1.0'
@@ -23,6 +24,29 @@ export interface IOAuthTokenSet {
 const sessionKey = 'oauth'
 
 export default class OAuth implements IOAuthCommon<IOAuthTokenSet> {
+	authenticate = asyncMiddleware(async (req: Request, res: Response) => {
+		const response = await this.signAndFetch(
+				this.config.requestTokenUrl,
+				{
+					method: 'POST',
+					oauthHeaders: {
+						oauth_callback: this.config.callbackUrl,
+					}
+				}
+		)
+		if (!response.ok) throw new OAuthError(await response.text())
+		const {
+			oauth_token,
+			oauth_token_secret,
+			oauth_callback_confirmed
+		} = qs.parse(await response.text())
+		if (oauth_callback_confirmed !== 'true') throw new Error('Failed to request access token')
+		req.session![sessionKey] = {
+			secret: oauth_token_secret
+		}
+		res.status(302).redirect(`${this.config.authorizeUrl}?${qs.stringify({oauth_token})}`)
+	})
+
 	constructor(
 			private config: {
 				consumerKey: string
@@ -50,28 +74,6 @@ export default class OAuth implements IOAuthCommon<IOAuthTokenSet> {
 		})
 	}
 
-	async authenticate(req: Request, res: Response) {
-		const response = await this.signAndFetch(
-				this.config.requestTokenUrl,
-				{
-					method: 'POST',
-					oauthHeaders: {
-						oauth_callback: this.config.callbackUrl,
-					}
-				}
-		)
-		if (!response.ok) throw new OAuthError(await response.text())
-		const {
-			oauth_token,
-			oauth_token_secret,
-			oauth_callback_confirmed
-		} = qs.parse(await response.text())
-		if (oauth_callback_confirmed !== 'true') throw new Error('Failed to request access token')
-		req.session![sessionKey] = {
-			secret: oauth_token_secret
-		}
-		res.status(302).redirect(`${this.config.authorizeUrl}?${qs.stringify({oauth_token})}`)
-	}
 	async callback(req: Request){
 		const {oauth_token, oauth_verifier} = req.query
 		if (!req.session![sessionKey]?.secret)

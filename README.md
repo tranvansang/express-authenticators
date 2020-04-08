@@ -42,8 +42,7 @@ fetchProfile(tokenSet: TokenType): Promise<{
 }>
 ```
 
-`authenticate`: async middleware. Your must wrap this middleware by `asyncMiddleware`.
-Otherwise, if error occurred, it will not be handled by next middleware, leading to a timeout request.
+`authenticate`: redirect middleware
 If there is no error, this middleware will redirect the user to the provider website.
 Eventually, redirect back to our pre-configured `redirectUri` with appropriate user privilege.
 
@@ -162,13 +161,13 @@ const facebookAuth = new FacebookAuthenticator({
 
 app.get(
 	'/auth/facebook',
-	asyncMiddleware(async (req, res) => {
+	(req, res, next) => {
 		req.session!.someInfo = 'my info' // do something e.g.
-		await facebookAuth.authenticate(req, res)
-	})
+		facebookAuth.authenticate(req, res, next)
+	}
 /*
 or
-app.get('/auth/facebook', asyncMiddleware(facebookAuth.authenticate))
+app.get('/auth/facebook', facebookAuth.authenticate)
 */
 )
 app.get(

@@ -1,5 +1,5 @@
 import { OAuthSigningMethod } from './oauthUtils';
-import { Request, Response } from 'express';
+import { Request } from 'express';
 import { IOAuthCommon } from '../OAuthCommon';
 declare type IHttpMethod = 'POST' | 'GET';
 interface IOAuthRequestOptions {
@@ -23,6 +23,7 @@ export interface IOAuthTokenSet {
 }
 export default class OAuth implements IOAuthCommon<IOAuthTokenSet> {
     private config;
+    authenticate: import("express").RequestHandler<import("express-serve-static-core").ParamsDictionary>;
     constructor(config: {
         consumerKey: string;
         consumerSecret: string;
@@ -33,7 +34,6 @@ export default class OAuth implements IOAuthCommon<IOAuthTokenSet> {
         signingMethod: OAuthSigningMethod;
     });
     signAndFetch(url: string, options: IOAuthRequestOptions, tokenSet?: IOAuthTokenSet): Promise<import("node-fetch").Response>;
-    authenticate(req: Request, res: Response): Promise<void>;
     callback(req: Request): Promise<{
         token: any;
         secret: any;

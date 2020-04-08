@@ -1,7 +1,7 @@
-import {Request, Response} from 'express'
+import {Request, RequestHandler} from 'express'
 
 export interface IOAuthCommon<T> {
-	authenticate(req: Request, res: Response): Promise<void> | void
+	authenticate: RequestHandler
 	callback(req: Request): Promise<T> | T
 }
 
