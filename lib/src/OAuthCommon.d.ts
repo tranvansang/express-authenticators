@@ -3,7 +3,7 @@ export interface IOAuthCommon<T> {
     authenticate: RequestHandler;
     callback(req: Request): Promise<T> | T;
 }
-interface IOAuthProfile {
+export interface IOAuthProfile {
     id?: string;
     email?: string;
     emailVerified?: boolean;
@@ -17,4 +17,3 @@ export interface IOAuthProfileFetcher<T> {
 }
 export declare class OAuthProfileError extends Error {
 }
-export {};

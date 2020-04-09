@@ -5,7 +5,7 @@ export interface IOAuthCommon<T> {
 	callback(req: Request): Promise<T> | T
 }
 
-interface IOAuthProfile {
+export interface IOAuthProfile {
 	id?: string
 	email?: string
 	emailVerified?: boolean
