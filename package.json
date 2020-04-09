@@ -11,6 +11,7 @@
     "passportjs",
     "express",
     "authenticator",
+    "authentication",
     "github",
     "twitter",
     "google",
