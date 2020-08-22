@@ -1,6 +1,6 @@
 {
   "name": "express-authenticators",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Third party authenticators in nodejs. Support various providers. Zero heavy dependencies.",
   "main": "lib/index.js",
   "repository": "github:tranvansang/express-authenticators",
