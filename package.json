@@ -25,9 +25,7 @@
     "oauth2"
   ],
   "files": [
-    "lib",
-    "index.js",
-    "index.d.ts"
+    "lib"
   ],
   "scripts": {
     "clean": "rm -rf lib coverage",
