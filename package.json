@@ -2,7 +2,7 @@
   "name": "express-authenticators",
   "version": "0.0.4",
   "description": "Third party authenticators in nodejs. Support various providers. Zero heavy dependencies.",
-  "main": "index.js",
+  "main": "lib/index.js",
   "repository": "github:tranvansang/express-authenticators",
   "author": "Tran Sang <info@transang.me>",
   "license": "MIT",
@@ -37,7 +37,6 @@
     "lint": "yarn eslint $(find src -type f ! -name '*.test.ts' | tr '\\n' ' ')"
   },
   "dependencies": {
-    "crypto": "^1.0.1",
     "middleware-async": "^1.2.7",
     "node-fetch": "^2.6.0",
     "qs": "^6.9.4",

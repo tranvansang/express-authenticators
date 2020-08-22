@@ -3,8 +3,6 @@ import qs from 'qs'
 import {getNonce, getTimestamp, oauthSign, OAuthSigningMethod} from './oauthUtils'
 // eslint-disable-next-line import/no-unresolved
 import type {Request, Response} from 'express'
-// eslint-disable-next-line import/no-unresolved
-import type {} from 'express-session'
 import OAuthError from './OAuthError'
 import r3986 from 'r3986'
 import {IOAuthCommon} from '../OAuthCommon'
@@ -83,11 +81,11 @@ export default class OAuth implements IOAuthCommon<IOAuthTokenSet> {
 		if (!req.session![sessionKey]?.secret) throw new OAuthError('Last token secret lost')
 		const response = await this.signAndFetch(this.config.accessTokenUrl, {
 			oauthHeaders: {
-				oauth_verifier,
+				oauth_verifier: oauth_verifier as string,
 			},
 			method: 'POST'
 		}, {
-			token: oauth_token,
+			token: oauth_token as string,
 			secret: req.session![sessionKey].secret
 		})
 		if (!response.ok) throw new OAuthError(await response.text())
@@ -99,7 +97,10 @@ export default class OAuth implements IOAuthCommon<IOAuthTokenSet> {
 			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			screen_name
 		} = qs.parse(await response.text())
-		return {token, secret}
+		return {
+			token: token as string,
+			secret: secret as string
+		}
 	}
 
 	private authorizationHeader(

@@ -42,13 +42,14 @@ export default class OAuth2 implements IOAuthCommon<string> {
 			|| req.query.error_reason
 		) {
 			const error = new OAuth2Error(
-				req.query.error_message
-				|| req.query.error_description
-				|| req.query.error_reason
-				|| req.query.error
-				|| 'Unknown OAuth2 error'
+				(req.query.error_message
+					|| req.query.error_description
+					|| req.query.error_reason
+					|| req.query.error
+					|| 'Unknown OAuth2 error'
+				) as string
 			)
-			error.code = req.query.error_code
+			error.code = req.query.error_code as string
 			throw error
 		}
 		const code = req.query.code
