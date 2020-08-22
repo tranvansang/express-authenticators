@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-unresolved
 import {Request, RequestHandler} from 'express'
 
 export interface IOAuthCommon<T> {

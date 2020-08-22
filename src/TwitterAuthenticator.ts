@@ -19,7 +19,7 @@ export default class TwitterAuthenticator extends OAuth implements IOAuthProfile
 		})
 	}
 
-	async fetchProfile(tokenSet: IOAuthTokenSet){
+	async fetchProfile(tokenSet: IOAuthTokenSet) {
 		const response = await this.signAndFetch(
 			'https://api.twitter.com/1.1/account/verify_credentials.json',
 			{
@@ -42,8 +42,11 @@ export default class TwitterAuthenticator extends OAuth implements IOAuthProfile
 			emailVerified: !!profile.email,
 			/**
 			 * from twitter docs
-			 * https://developer.twitter.com/en/docs/accounts-and-users/manage-account-settings/api-reference/get-account-verify_credentials
-			 * When set to true email will be returned in the user objects as a string. If the user does not have an email address on their account, or if the email address is not verified, null will be returned.
+			 * https://developer.twitter.com/en/docs/accounts-and-users
+			 * /manage-account-settings/api-reference/get-account-verify_credentials
+			 * When set to true email will be returned in the user objects as a string.
+			 * If the user does not have an email address on their account,
+			 * or if the email address is not verified, null will be returned.
 			 */
 		}
 	}

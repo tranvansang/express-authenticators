@@ -1,7 +1,10 @@
 import fetch from 'node-fetch'
 import qs from 'qs'
 import {getNonce, getTimestamp, oauthSign, OAuthSigningMethod} from './oauthUtils'
-import {Request, Response} from 'express'
+// eslint-disable-next-line import/no-unresolved
+import type {Request, Response} from 'express'
+// eslint-disable-next-line import/no-unresolved
+import type {} from 'express-session'
 import OAuthError from './OAuthError'
 import r3986 from 'r3986'
 import {IOAuthCommon} from '../OAuthCommon'
@@ -26,13 +29,13 @@ const sessionKey = 'oauth'
 export default class OAuth implements IOAuthCommon<IOAuthTokenSet> {
 	authenticate = asyncMiddleware(async (req: Request, res: Response) => {
 		const response = await this.signAndFetch(
-				this.config.requestTokenUrl,
-				{
-					method: 'POST',
-					oauthHeaders: {
-						oauth_callback: this.config.callbackUrl,
-					}
+			this.config.requestTokenUrl,
+			{
+				method: 'POST',
+				oauthHeaders: {
+					oauth_callback: this.config.callbackUrl,
 				}
+			}
 		)
 		if (!response.ok) throw new OAuthError(await response.text())
 		const {
@@ -47,6 +50,7 @@ export default class OAuth implements IOAuthCommon<IOAuthTokenSet> {
 		res.status(302).redirect(`${this.config.authorizeUrl}?${qs.stringify({oauth_token})}`)
 	})
 
+	// eslint-disable-next-line no-useless-constructor
 	constructor(
 			private config: {
 				consumerKey: string
@@ -57,13 +61,13 @@ export default class OAuth implements IOAuthCommon<IOAuthTokenSet> {
 				authorizeUrl: string
 				signingMethod: OAuthSigningMethod
 			},
-	){}
+	) {}
 
 	signAndFetch(
-			url: string,
-			options: IOAuthRequestOptions,
-			tokenSet?: IOAuthTokenSet
-	){
+		url: string,
+		options: IOAuthRequestOptions,
+		tokenSet?: IOAuthTokenSet
+	) {
 		return fetch(`${url}${options.qs ? `?${qs.stringify(options.qs)}` : ''}`, {
 			headers: {
 				...options.headers,
@@ -74,10 +78,9 @@ export default class OAuth implements IOAuthCommon<IOAuthTokenSet> {
 		})
 	}
 
-	async callback(req: Request){
+	async callback(req: Request) {
 		const {oauth_token, oauth_verifier} = req.query
-		if (!req.session![sessionKey]?.secret)
-			throw new OAuthError('Last token secret lost')
+		if (!req.session![sessionKey]?.secret) throw new OAuthError('Last token secret lost')
 		const response = await this.signAndFetch(this.config.accessTokenUrl, {
 			oauthHeaders: {
 				oauth_verifier,
@@ -91,7 +94,9 @@ export default class OAuth implements IOAuthCommon<IOAuthTokenSet> {
 		const {
 			oauth_token: token,
 			oauth_token_secret: secret,
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			user_id,
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			screen_name
 		} = qs.parse(await response.text())
 		return {token, secret}
@@ -105,7 +110,7 @@ export default class OAuth implements IOAuthCommon<IOAuthTokenSet> {
 			oauthHeaders
 		}: IOAuthRequestOptions,
 		tokenSet?: IOAuthTokenSet
-	){
+	) {
 		const authHeaders = {
 			oauth_consumer_key: this.config.consumerKey,
 			oauth_signature_method: this.config.signingMethod,

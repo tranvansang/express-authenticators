@@ -27,12 +27,14 @@ export const fetchGithubProfile = async (
 			(meta: any) => meta?.primary,
 			(meta: any) => meta?.visibility === 'public',
 			() => true,
-		]) for(const emailData of emails || [])
-			if (emailData?.email && emailFilter(emailData))
-				return {
-					email: emailData.email,
-					emailVerified: emailData.verified
-				}
+		]) for (
+			const emailData of emails || []
+		) if (
+			emailData?.email && emailFilter(emailData)
+		) return {
+			email: emailData.email,
+			emailVerified: emailData.verified
+		}
 	}
 	const profile = await res.json()
 	if (!profile.id) throw new OAuthProfileError('Invalid Github profile ID')

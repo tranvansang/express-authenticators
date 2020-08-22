@@ -20,8 +20,9 @@ const fetchGoogleProfile = async (
 	})}`)
 	if (!res.ok) throw new OAuthProfileError(await res.text())
 	const profile = await res.json()
-	if (!profile.resourceName?.startsWith('people/'))
-		throw new OAuthProfileError('Invalid response from Google People API')
+	if (
+		!profile.resourceName?.startsWith('people/')
+	) throw new OAuthProfileError('Invalid response from Google People API')
 	const id = profile.resourceName.substr('people/'.length)
 	if (!id) throw new OAuthProfileError('Invalid Google profile ID')
 	const getEmail = () => {
@@ -30,37 +31,48 @@ const fetchGoogleProfile = async (
 			(meta: any) => meta?.verified,
 			(meta: any) => meta?.primary,
 			() => true,
-		]) for(const email of profile.emailAddresses || [])
-			if (email?.value && metaFilter(email.metadata))
-				return {
-					email: email.value,
-					emailVerified: email.metadata?.verified || false
-				}
+		]) for (
+			const email of profile.emailAddresses || []
+		) if (
+			email?.value && metaFilter(email.metadata)
+		) return {
+			email: email.value,
+			emailVerified: email.metadata?.verified || false
+		}
 	}
 	const primaryMetaFilters = [
 		(meta: any) => meta?.primary,
 		() => true
 	]
 	const getAvatar = () => {
-		for (const metaFilter of primaryMetaFilters)
-			for (const photo of profile.photos || [])
-				if (photo.url && metaFilter(photo.metadata))
-					return photo.url.replace(/=s100$/, `=s${profilePictureSize}`)
+		for (
+			const metaFilter of primaryMetaFilters
+		) for (
+			const photo of profile.photos || []
+		) if (
+			photo.url && metaFilter(photo.metadata)
+		) return photo.url.replace(/=s100$/, `=s${profilePictureSize}`)
 	}
 	const getFirstLast = () => {
-		for (const metaFilter of primaryMetaFilters)
-			for (const name of profile.names || [])
-				if (metaFilter(name.metadata))
-					return {
-						first: name.givenName,
-						last: name.familyName
-					}
-		for (const metaFilter of primaryMetaFilters)
-			for (const nickname of profile.nicknames || [])
-				if (nickname.value && metaFilter(nickname.metadata))
-					return {
-						first: nickname.value,
-					}
+		for (
+			const metaFilter of primaryMetaFilters
+		) for (
+			const name of profile.names || []
+		) if (
+			metaFilter(name.metadata)
+		) return {
+			first: name.givenName,
+			last: name.familyName
+		}
+		for (
+			const metaFilter of primaryMetaFilters
+		) for (
+			const nickname of profile.nicknames || []
+		) if (
+			nickname.value && metaFilter(nickname.metadata)
+		) return {
+			first: nickname.value,
+		}
 	}
 	return {
 		id,

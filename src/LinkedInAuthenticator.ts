@@ -6,14 +6,14 @@ const fetchLinkedInProfile = async (
 	token: string,
 ) => {
 	const res = await fetch(`https://api.linkedin.com/v2/me?projection=(${
-			[
-				'id',
-				'profilePicture(displayImage~:playableStreams)',
-				'firstName',
-				'lastName',
-				'localizedFirstName',
-				'localizedLastName',
-			].join(',')
+		[
+			'id',
+			'profilePicture(displayImage~:playableStreams)',
+			'firstName',
+			'lastName',
+			'localizedFirstName',
+			'localizedLastName',
+		].join(',')
 	})`, {
 		headers: {
 			Authorization: `Bearer ${token}`,

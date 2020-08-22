@@ -1,15 +1,12 @@
+// eslint-disable-next-line import/no-unresolved
 import {Request, Response} from 'express'
 import {v4} from 'uuid'
 import * as qs from 'qs'
 import fetch from 'node-fetch'
 import {IOAuthCommon} from '../OAuthCommon'
+import OAuth2Error from './OAuth2Error'
 
 const sessionKey = 'oauth2'
-
-export class OAuth2Error extends Error {
-	public code?: string
-	name = 'OAuth2Error'
-}
 
 export enum TokenRequestMethod {
 	GET = 'GET',
@@ -17,6 +14,7 @@ export enum TokenRequestMethod {
 }
 
 export default class OAuth2 implements IOAuthCommon<string> {
+	// eslint-disable-next-line no-useless-constructor
 	constructor(
 		private config: {
 			consentURL: string
@@ -33,11 +31,16 @@ export default class OAuth2 implements IOAuthCommon<string> {
 		}
 	) {}
 
-	async callback(req: Request){
+	async callback(req: Request) {
 		const state = req.query.state
-		if (state !== req.session![sessionKey]?.state)
-			throw new OAuth2Error('Invalid returning state')
-		if (req.query.error_code || req.query.error || req.query.error_description || req.query.error_message || req.query.error_reason) {
+		if (state !== req.session![sessionKey]?.state) throw new OAuth2Error('Invalid returning state')
+		if (
+			req.query.error_code
+			|| req.query.error
+			|| req.query.error_description
+			|| req.query.error_message
+			|| req.query.error_reason
+		) {
 			const error = new OAuth2Error(
 				req.query.error_message
 				|| req.query.error_description
@@ -74,6 +77,7 @@ export default class OAuth2 implements IOAuthCommon<string> {
 		} catch (err) {
 			throw new OAuth2Error(err.message)
 		}
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const {access_token, token_type, expires_in} = json
 		if (!access_token) throw new OAuth2Error('Token not found')
 		return access_token
@@ -84,11 +88,11 @@ export default class OAuth2 implements IOAuthCommon<string> {
 		req.session![sessionKey] = {state}
 		res.status(302).redirect(`${this.config.consentURL}?\
 ${qs.stringify({
-			client_id: this.config.clientID,
-			redirect_uri: this.config.redirectUri,
-			state,
-			scope: this.config.scope,
-			response_type: 'code'
-		})}`)
+		client_id: this.config.clientID,
+		redirect_uri: this.config.redirectUri,
+		state,
+		scope: this.config.scope,
+		response_type: 'code'
+	})}`)
 	}
 }

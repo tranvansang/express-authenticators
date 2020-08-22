@@ -19,20 +19,20 @@ export default class TumblrAuthenticator extends OAuth implements IOAuthProfileF
 		})
 	}
 
-	async fetchProfile(tokenSet: IOAuthTokenSet){
+	async fetchProfile(tokenSet: IOAuthTokenSet) {
 		const response = await this.signAndFetch(
-				'https://api.tumblr.com/v2/user/info',
-				{},
-				tokenSet
+			'https://api.tumblr.com/v2/user/info',
+			{},
+			tokenSet
 		)
 		if (!response.ok) throw new OAuthProfileError(await response.text())
 		const profile = await response.json()
 		let blogProfile
 		if (profile?.response?.user?.name) {
 			const blogResponse = await this.signAndFetch(
-					`https://api.tumblr.com/v2/blog/${profile.response.user.name}.tumblr.com/info`,
-					{},
-					tokenSet
+				`https://api.tumblr.com/v2/blog/${profile.response.user.name}.tumblr.com/info`,
+				{},
+				tokenSet
 			)
 			if (blogResponse.ok) {
 				blogProfile = await blogResponse.json()

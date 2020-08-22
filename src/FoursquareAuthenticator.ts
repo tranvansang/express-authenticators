@@ -19,7 +19,9 @@ const fetchFoursquareProfile = async (
 		last: profile.response.user.lastName,
 		email: profile.response.user.contact?.email || undefined,
 		emailVerified: false,
-		avatar: profile.response.user.photo?.prefix ? `${profile.response.user.photo?.prefix}original${profile.response.user.photo?.suffix}` : '',
+		avatar: profile.response.user.photo?.prefix
+			? `${profile.response.user.photo?.prefix}original${profile.response.user.photo?.suffix}`
+			: '',
 		raw: profile
 	}
 }

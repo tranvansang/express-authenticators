@@ -1,47 +1,36 @@
 {
 	"extends": [
 		"airbnb-base",
-		"eslint:recommended"
+		"eslint:recommended",
+		"plugin:@typescript-eslint/recommended"
 	],
 	"settings": {
+		"import/extensions": [".js",".ts"],
 		"import/resolver": {
 			"node": {
-				"extensions": [
-					".js",
-					".jsx",
-					".ts",
-					".tsx"
-				]
+				"extensions": [".js", ".ts"]
 			}
-		},
-		"react": {
-			"version": "detect"
 		}
 	},
 	"env": {
 		"node": true,
 		"es6": true,
-		"browser": true,
 		"jest": true
 	},
 	"plugins": [
 		"babel",
-		"jest"
+		"jest",
+		"@typescript-eslint"
 	],
 	"rules": {
 		"no-tabs": "off",
-		"no-irregular-whitespace": "off",
+		"no-irregular-whitespace": "warn",
 		"comma-dangle": "off",
 		"function-paren-newline": "off",
 		"no-param-reassign": "off",
-		"semi": [
-			"error",
-			"never"
-		],
-		"indent": ["error", "tab"],
-		"import/first": "off",
-		"import/order": "off",
-		"import/prefer-default-export": "off",
+		"semi": ["error", "never"],
+		"semi-style": ["error", "first"],
+		"indent": ["error", "tab", {"SwitchCase": 1}],
 		"object-curly-spacing": "off",
 		"padded-blocks": "off",
 		"spaced-comment": "off",
@@ -51,16 +40,8 @@
 		"lines-between-class-members": "off",
 		"object-curly-newline": "off",
 		"consistent-return": "off",
-		"max-len": [
-			"error",
-			{
-				"code": 120
-			}
-		],
-		"arrow-parens": [
-			"error",
-			"as-needed"
-		],
+		"max-len": ["error", {"code":	120}],
+		"arrow-parens": ["error", "as-needed"],
 		"no-async-promise-executor": "off",
 		"no-confusing-arrow": "off",
 		"no-nested-ternary": "off",
@@ -71,12 +52,33 @@
 		"prefer-destructuring": "off",
 		"no-mixed-operators": "off",
 		"no-return-await": "off",
-		"no-plusplus": "off"
+		"no-plusplus": "off",
+		"no-await-in-loop": "off",
+		"no-void": "off",
+		"no-continue": "off",
+		"camelcase": "off",
+		"eol-last": "off",
+		"import/first": "off",
+		"import/order": "off",
+		"import/prefer-default-export": "off",
+		"import/extensions": [
+			"error",
+			"ignorePackages",
+			{
+				"js": "never",
+				"ts": "never"
+			}
+		],
+		"@typescript-eslint/no-explicit-any": "off",
+		"@typescript-eslint/explicit-module-boundary-types": "off",
+		"@typescript-eslint/no-non-null-assertion": "off"
 	},
-	"parser": "babel-eslint",
+	"parser": "@typescript-eslint/parser",
 	"parserOptions": {
+		"ecmaVersion": 6,
+		"sourceType": "module",
 		"ecmaFeatures": {
-			"legacyDecorators": true
+			"modules": true
 		}
 	},
 	"globals": {

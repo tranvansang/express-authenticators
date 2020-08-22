@@ -6,10 +6,10 @@ import qs from 'qs'
 const fetchInstagramProfile = async (
 	token: string,
 	fields = [
-			'account_type',
-			'id',
-			'media_count',
-			'username'
+		'account_type',
+		'id',
+		'media_count',
+		'username'
 	]
 ) => {
 	const res = await fetch(`https://graph.instagram.com/me?${qs.stringify({
@@ -24,9 +24,9 @@ const fetchInstagramProfile = async (
 	const profile = await res.json()
 	if (!profile.id) throw new OAuthProfileError('Invalid Instagram profile ID')
 	let graphProfile
-	if (profile.username){
+	if (profile.username) {
 		const graphRes = await fetch(`https://instagram.com/${profile.username}/?__a=1`)
-		if (graphRes.ok){
+		if (graphRes.ok) {
 			graphProfile = await graphRes.json()
 		}
 	}
@@ -54,7 +54,7 @@ export default class InstagramAuthenticator extends OAuth2 implements IOAuthProf
 			tokenURL: 'https://api.instagram.com/oauth/access_token',
 			scope: [
 				'user_profile',
-			].join(' '),//separator can be comma or space
+			].join(' '), //separator can be comma or space
 			...options,
 		}, {
 			ignoreGrantType: false,

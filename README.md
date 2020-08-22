@@ -4,24 +4,75 @@
 
 Third party authenticator module re-written in Typescript
 
-- Support OAuth and OAuth2 protocols without any dependency
-- Re-written the oauth/oauth2 protocols in modern Typescript. Very easy to be maintained
-- Support fetching user profile for various providers: Goolge, Facebook, Twitter, Instagram, Tumblr, Github, LinkedIn, Pinterest, Foursquare.
+- Zero dependency OAuth and OAuth2 implementations in Typescript.
+- Support fetching user profile for various providers: Google, Facebook, Twitter, Instagram, Tumblr, Github, LinkedIn, Pinterest, Foursquare.
 
 # Usage
 
 - With `yarn`: `yarn add express-authenticators`.
 - With `npm`: `npm install --save express-authenticators`.
 
+## Sample code
+
+```javascript
+
+const {
+	FacebookAuthenticator,
+	FoursquareAuthenticator,
+	GithubAuthenticator,
+	GoogleAuthenticator,
+	InstagramAuthenticator,
+	LinkedInAuthenticator,
+	PinterestAuthenticator,
+	TumblrAuthenticator,
+	TwitterAuthenticator,
+	OAuth2,
+	OAuth
+} = require('express-authenticators')
+const express = require('express')
+const session = require('express-session')
+const asyncMiddleware = require('middleware-async')
+
+const app = express()
+app.use(session())
+
+const facebookAuth = new FacebookAuthenticator({
+	clientID: 'facebook app id',
+	clientSecret: 'facebook app secret',
+	redirectUri: `https://example.com/auth/facebook/callback`,
+})
+
+app.get(
+	'/auth/facebook',
+	(req, res, next) => {
+		req.session!.someInfo = 'my info' // store the user credential
+		facebookAuth.authenticate(req, res, next)
+	}
+/*
+or
+app.get('/auth/facebook', facebookAuth.authenticate)
+*/
+)
+app.get(
+	`/auth/facebook/callback`,
+	asyncMiddleware(async (req, res) => {
+		const token = await facebookAuth.callback(req)
+		const profile = await facebookAuth.fetchProfile(token)
+		console.log('got profile', profile)
+		res.send(JSON.stringify(profile))
+	})
+)
+
+```
 # API references
 
-This module required `express-session` middleware to be pre-configured
+This module requires `express-session` middleware to be applied before.
 
 Exported classes:
 
 - `FacebookAuthenticator`, `FoursquareAuthenticator`, `GithubAuthenticator`, `GoogleAuthenticator`, `InstagramAuthenticator`, `LinkedInAuthenticator`, `PinterestAuthenticator`, `TumblrAuthenticator`, `TwitterAuthenticator`.
 	
-	All these classes have same interface, they all inherit OAuth2 or OAuth classes
+	All these classes have a same interface, they all inherit OAuth2 or OAuth classes
 	
 ```typescript
  constructor(option: {
@@ -56,11 +107,11 @@ This function should be called in the callback url handler. Check example at the
 	
 In principle these classes have `authenticate` and `callback` methods.
 However, I recommend you use the provider-specific classes described above.
-If you need additional provider, clone the other providers' implementations then make your own.
+If you need an additional provider, clone the other providers' implementations then make your own.
 
 Here are two sample implementations of `FacebookAuthenticator` (`OAuth2`), and `TwitterAuthenticator` (`OAuth`)
 
-```javascript
+```typescript
 class FacebookAuthenticator extends OAuth2 implements IOAuthProfileFetcher<string> {
 	fetchProfile = fetchFacebookProfile //make your own profile fetcher
 	constructor(options: {
@@ -130,54 +181,3 @@ class TwitterAuthenticator extends OAuth implements IOAuthProfileFetcher<IOAuthT
 }
 ```
 
-## Usage example
-```typescript
-
-import {
-	FacebookAuthenticator,
-	FoursquareAuthenticator,
-	GithubAuthenticator,
-	GoogleAuthenticator,
-	InstagramAuthenticator,
-	LinkedInAuthenticator,
-	PinterestAuthenticator,
-	TumblrAuthenticator,
-	TwitterAuthenticator,
-	OAuth2,
-	OAuth
-} from 'express-authenticators'
-import express from 'express'
-import session from 'express-session'
-import asyncMiddleware from 'middleware-async'
-
-const app = express()
-app.use(session())
-
-const facebookAuth = new FacebookAuthenticator({
-	clientID: 'facebook app id',
-	clientSecret: 'facebook app secret',
-	redirectUri: `https://example.com/auth/facebook/callback`,
-})
-
-app.get(
-	'/auth/facebook',
-	(req, res, next) => {
-		req.session!.someInfo = 'my info' // do something e.g.
-		facebookAuth.authenticate(req, res, next)
-	}
-/*
-or
-app.get('/auth/facebook', facebookAuth.authenticate)
-*/
-)
-app.get(
-	`/auth/facebook/callback`,
-	asyncMiddleware(async (req, res) => {
-		const token = await facebookAuth.callback(req)
-		const profile = await facebookAuth.fetchProfile(token)
-		console.log('got profile', profile)
-		res.send(JSON.stringify(profile))
-	})
-)
-
-```
