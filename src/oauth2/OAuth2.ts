@@ -32,8 +32,10 @@ export default class OAuth2 implements IOAuthCommon<string> {
 	) {}
 
 	async callback(req: Request) {
+		const sessionState = req.session![sessionKey]?.state
+		delete req.session![sessionKey]?.state
 		const state = req.query.state
-		if (state !== req.session![sessionKey]?.state) throw new OAuth2Error('Invalid returning state')
+		if (state !== sessionState) throw new OAuth2Error('Invalid returning state')
 		if (
 			req.query.error_code
 			|| req.query.error
