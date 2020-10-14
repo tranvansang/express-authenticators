@@ -78,7 +78,9 @@ export default class OAuth implements IOAuthCommon<IOAuthTokenSet> {
 
 	async callback(req: Request) {
 		const {oauth_token, oauth_verifier} = req.query
-		if (!req.session![sessionKey]?.secret) throw new OAuthError('Last token secret lost')
+		const sessionSecret = req.session![sessionKey]?.secret
+		delete req.session![sessionKey]?.secret
+		if (!sessionSecret) throw new OAuthError('Last token secret lost')
 		const response = await this.signAndFetch(this.config.accessTokenUrl, {
 			oauthHeaders: {
 				oauth_verifier: oauth_verifier as string,
@@ -86,7 +88,7 @@ export default class OAuth implements IOAuthCommon<IOAuthTokenSet> {
 			method: 'POST'
 		}, {
 			token: oauth_token as string,
-			secret: req.session![sessionKey].secret
+			secret: sessionSecret
 		})
 		if (!response.ok) throw new OAuthError(await response.text())
 		const {
