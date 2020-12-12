@@ -31,7 +31,7 @@ const {
 } = require('express-authenticators')
 const express = require('express')
 const session = require('express-session')
-const asyncMiddleware = require('middleware-async')
+const asyncMiddleware = require('middleware-async').default
 
 const app = express()
 app.use(session())
@@ -45,7 +45,7 @@ const facebookAuth = new FacebookAuthenticator({
 app.get(
 	'/auth/facebook',
 	(req, res, next) => {
-		req.session!.someInfo = 'my info' // store the user credential
+		req.session.someInfo = 'my info' // store the user credential
 		facebookAuth.authenticate(req, res, next)
 	}
 /*
@@ -75,7 +75,7 @@ Exported classes:
 	All these classes have a same interface, they all inherit OAuth2 or OAuth classes
 	
 ```typescript
- constructor(option: {
+constructor(option: {
     clientID: 'app id',
     clientSecret: 'app secret',
     redirectUri: `https://example.com/auth/<provider>/callback`
