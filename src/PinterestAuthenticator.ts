@@ -34,7 +34,8 @@ export default class PinterestAuthenticator extends OAuth2 implements IOAuthProf
 		}, {
 			ignoreGrantType: false,
 			tokenRequestMethod: TokenRequestMethod.POST,
-			includeStateInAccessToken: false
+			includeStateInAccessToken: false,
+			enablePKCE: true,
 		})
 	}
 }

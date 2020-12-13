@@ -51,7 +51,8 @@ export default class LinkedInAuthenticator extends OAuth2 implements IOAuthProfi
 		}, {
 			ignoreGrantType: false,
 			tokenRequestMethod: TokenRequestMethod.POST,
-			includeStateInAccessToken: true
+			includeStateInAccessToken: true,
+			enablePKCE: true,
 		})
 	}
 }

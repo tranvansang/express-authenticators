@@ -5,6 +5,7 @@ import * as qs from 'qs'
 import fetch from 'node-fetch'
 import {IOAuthCommon} from '../OAuthCommon'
 import OAuth2Error from './OAuth2Error'
+import crypto from 'crypto'
 
 const sessionKey = 'oauth2'
 
@@ -28,13 +29,14 @@ export default class OAuth2 implements IOAuthCommon<string> {
 			ignoreGrantType: boolean
 			tokenRequestMethod: TokenRequestMethod
 			includeStateInAccessToken: boolean
+			enablePKCE: boolean
 		}
 	) {}
 
-	async callback(req: Request) {
-		const sessionState = req.session![sessionKey]?.state
-		delete req.session![sessionKey]?.state
-		const state = req.query.state
+	public async callback(req: Request) {
+		const {state: sessionState, verifier} = req.session![sessionKey] || {}
+		delete req.session![sessionKey]
+		const {state} = req.query
 		if (state !== sessionState) throw new OAuth2Error('Invalid returning state')
 		if (
 			req.query.error_code
@@ -55,23 +57,24 @@ export default class OAuth2 implements IOAuthCommon<string> {
 			throw error
 		}
 		const code = req.query.code
-		const requestBody = {
+		const body = qs.stringify({
 			client_id: this.config.clientID,
 			redirect_uri: this.config.redirectUri,
 			client_secret: this.config.clientSecret,
 			code,
 			...!this.options.ignoreGrantType && {grant_type: 'authorization_code'},
-			...this.options.includeStateInAccessToken && {state}
-		}
+			...this.options.includeStateInAccessToken && {state},
+			...this.options.enablePKCE && {code_verifier: verifier},
+		})
 		const response = this.options.tokenRequestMethod === TokenRequestMethod.GET
-			? await fetch(`${this.config.tokenURL}?${qs.stringify(requestBody)}`)
+			? await fetch(`${this.config.tokenURL}?${body}`)
 			: await fetch(this.config.tokenURL, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/x-www-form-urlencoded',
 					Accept: 'application/json',
 				},
-				body: qs.stringify(requestBody)
+				body
 			})
 		if (!response.ok) throw new OAuth2Error(await response.text() || 'Cannot get access token')
 		let json
@@ -80,22 +83,33 @@ export default class OAuth2 implements IOAuthCommon<string> {
 		} catch (err) {
 			throw new OAuth2Error(err.message)
 		}
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		const {access_token, token_type, expires_in} = json
-		if (!access_token) throw new OAuth2Error('Token not found')
-		return access_token
+		// const {access_token, token_type, expires_in, refresh_token} = json
+		if (!json.access_token) throw new OAuth2Error('Token not found')
+		return json
 	}
 
-	authenticate(req: Request, res: Response) {
+	public authenticate(req: Request, res: Response) {
 		const state = v4()
-		req.session![sessionKey] = {state}
+		const verifier = v4()
+		req.session![sessionKey] = {state, verifier}
 		res.status(302).redirect(`${this.config.consentURL}?\
 ${qs.stringify({
 		client_id: this.config.clientID,
 		redirect_uri: this.config.redirectUri,
 		state,
 		scope: this.config.scope,
-		response_type: 'code'
+		response_type: 'code',
+		...this.options.enablePKCE && {
+			code_challenge: crypto
+				.createHash('sha256')
+				.update(Buffer.from(verifier))
+				.digest()
+				.toString('base64')
+				.replace(/\+/g, '-')
+				.replace(/\//g, '_')
+				.replace(/=/g, ''),
+			code_challenge_method: 'S256'
+		}
 	})}`)
 	}
 }

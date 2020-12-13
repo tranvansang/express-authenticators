@@ -1,5 +1,5 @@
 import OAuth2, {TokenRequestMethod} from './oauth2/OAuth2'
-import * as qs from 'qs'
+import qs from 'qs'
 import fetch from 'node-fetch'
 import {IOAuthProfileFetcher, OAuthProfileError} from './OAuthCommon'
 
@@ -85,7 +85,7 @@ const fetchGoogleProfile = async (
 
 export default class GoogleAuthenticator extends OAuth2 implements IOAuthProfileFetcher<string> {
 	fetchProfile = fetchGoogleProfile
-	constructor(options: {
+	constructor(private childConfig: {
 		clientID: string
 		clientSecret: string
 		redirectUri: string
@@ -98,11 +98,29 @@ export default class GoogleAuthenticator extends OAuth2 implements IOAuthProfile
 				'https://www.googleapis.com/auth/userinfo.email',
 				'https://www.googleapis.com/auth/userinfo.profile'
 			].join(' '),
-			...options,
+			...childConfig,
 		}, {
 			ignoreGrantType: false,
 			tokenRequestMethod: TokenRequestMethod.POST,
-			includeStateInAccessToken: false
+			includeStateInAccessToken: false,
+			enablePKCE: true,
 		})
+	}
+
+	async refreshAccessToken(refreshToken: string) {
+		const response = await fetch('https://oauth2.googleapis.com/token', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/x-www-form-urlencoded',
+				Accept: 'application/json',
+			},
+			body: qs.stringify({
+				client_id: this.childConfig.clientID,
+				client_secret: this.childConfig.clientSecret,
+				grant_type: 'refresh_token',
+				refresh_token: refreshToken
+			})
+		})
+		return await response.json()
 	}
 }

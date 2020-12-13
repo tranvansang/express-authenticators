@@ -53,13 +53,15 @@ export default class InstagramAuthenticator extends OAuth2 implements IOAuthProf
 			consentURL: 'https://api.instagram.com/oauth/authorize',
 			tokenURL: 'https://api.instagram.com/oauth/access_token',
 			scope: [
-				'user_profile',
+				'instagram_graph_user_profile',
+				'instagram_graph_user_media'
 			].join(' '), //separator can be comma or space
 			...options,
 		}, {
 			ignoreGrantType: false,
 			tokenRequestMethod: TokenRequestMethod.POST,
-			includeStateInAccessToken: false
+			includeStateInAccessToken: false,
+			enablePKCE: true,
 		})
 	}
 }

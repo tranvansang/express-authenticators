@@ -67,7 +67,8 @@ export default class GithubAuthenticator extends OAuth2 implements IOAuthProfile
 		}, {
 			ignoreGrantType: true,
 			tokenRequestMethod: TokenRequestMethod.POST,
-			includeStateInAccessToken: true
+			includeStateInAccessToken: true,
+			enablePKCE: true,
 		})
 	}
 }

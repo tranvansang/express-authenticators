@@ -6,6 +6,7 @@ Third party authenticator module re-written in Typescript
 
 - Zero dependency OAuth and OAuth2 implementations in Typescript.
 - Support fetching user profile for various providers: Google, Facebook, Twitter, Instagram, Tumblr, Github, LinkedIn, Pinterest, Foursquare.
+- Support PKCE([Proof Key for Code Exchange](https://oauth.net/2/pkce/)).
 
 # Usage
 

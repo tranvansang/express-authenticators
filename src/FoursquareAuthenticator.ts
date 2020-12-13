@@ -41,7 +41,8 @@ export default class FoursquareAuthenticator extends OAuth2 implements IOAuthPro
 		}, {
 			ignoreGrantType: false,
 			tokenRequestMethod: TokenRequestMethod.GET,
-			includeStateInAccessToken: false
+			includeStateInAccessToken: false,
+			enablePKCE: true,
 		})
 	}
 }

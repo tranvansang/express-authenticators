@@ -16,7 +16,7 @@ const fetchFacebookProfile = async (
 		'name'
 	]
 ) => {
-	const res = await fetch(`https://graph.facebook.com/v6.0/me?${qs.stringify({
+	const res = await fetch(`https://graph.facebook.com/v9.0/me?${qs.stringify({
 		access_token: token,
 		fields: fields.join(',')
 	})}`)
@@ -29,7 +29,7 @@ const fetchFacebookProfile = async (
 		last: profile.last_name,
 		email: profile.email,
 		emailVerified: !!profile.email,
-		avatar: `https://graph.facebook.com/v6.0/${profile.id}/picture?width=${profilePictureWidth}`,
+		avatar: `https://graph.facebook.com/v9.0/${profile.id}/picture?width=${profilePictureWidth}`,
 		raw: profile
 	}
 }
@@ -43,14 +43,15 @@ export default class FacebookAuthenticator extends OAuth2 implements IOAuthProfi
 		scope?: string
 	}) {
 		super({
-			consentURL: 'https://www.facebook.com/v6.0/dialog/oauth',
-			tokenURL: 'https://graph.facebook.com/v6.0/oauth/access_token',
+			consentURL: 'https://www.facebook.com/v9.0/dialog/oauth',
+			tokenURL: 'https://graph.facebook.com/v9.0/oauth/access_token',
 			scope: ['email'].join(','),
 			...options,
 		}, {
 			ignoreGrantType: true,
 			tokenRequestMethod: TokenRequestMethod.GET,
-			includeStateInAccessToken: false
+			includeStateInAccessToken: false,
+			enablePKCE: true,
 		})
 	}
 }

@@ -25,7 +25,7 @@ export interface IOAuthTokenSet {
 const sessionKey = 'oauth'
 
 export default class OAuth implements IOAuthCommon<IOAuthTokenSet> {
-	authenticate = asyncMiddleware(async (req: Request, res: Response) => {
+	public authenticate = asyncMiddleware(async (req: Request, res: Response) => {
 		const response = await this.signAndFetch(
 			this.config.requestTokenUrl,
 			{
@@ -61,7 +61,7 @@ export default class OAuth implements IOAuthCommon<IOAuthTokenSet> {
 			},
 	) {}
 
-	signAndFetch(
+	public signAndFetch(
 		url: string,
 		options: IOAuthRequestOptions,
 		tokenSet?: IOAuthTokenSet
@@ -76,7 +76,7 @@ export default class OAuth implements IOAuthCommon<IOAuthTokenSet> {
 		})
 	}
 
-	async callback(req: Request) {
+	public async callback(req: Request) {
 		const {oauth_token, oauth_verifier} = req.query
 		const sessionSecret = req.session![sessionKey]?.secret
 		delete req.session![sessionKey]?.secret
