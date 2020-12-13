@@ -61,7 +61,7 @@ export default class InstagramAuthenticator extends OAuth2 implements IOAuthProf
 			ignoreGrantType: false,
 			tokenRequestMethod: TokenRequestMethod.POST,
 			includeStateInAccessToken: false,
-			enablePKCE: true,
+			enablePKCE: false,
 		})
 	}
 }

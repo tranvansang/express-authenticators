@@ -34,8 +34,8 @@ export default class OAuth2 implements IOAuthCommon<string> {
 	) {}
 
 	public async callback(req: Request) {
-		const {state: sessionState, verifier} = req.session![sessionKey] || {}
-		delete req.session![sessionKey]
+		const {state: sessionState, verifier} = (req.session as any)[sessionKey] || {}
+		delete (req.session as any)[sessionKey]
 		const {state} = req.query
 		if (state !== sessionState) throw new OAuth2Error('Invalid returning state')
 		if (
@@ -91,7 +91,7 @@ export default class OAuth2 implements IOAuthCommon<string> {
 	public authenticate(req: Request, res: Response) {
 		const state = v4()
 		const verifier = v4()
-		req.session![sessionKey] = {state, verifier}
+		;(req.session as any)[sessionKey] = {state, verifier}
 		res.status(302).redirect(`${this.config.consentURL}?\
 ${qs.stringify({
 		client_id: this.config.clientID,

@@ -34,13 +34,24 @@
 		"object-curly-spacing": "off",
 		"padded-blocks": "off",
 		"spaced-comment": "off",
-		"radix": "off",
 		"no-restricted-globals": "off",
 		"curly": "off",
 		"lines-between-class-members": "off",
 		"object-curly-newline": "off",
 		"consistent-return": "off",
-		"max-len": ["error", {"code":	120}],
+		"max-len": [
+			"error",
+			{
+				"code": 120,
+				// TODO change tabWidth to 2 when intellij does support overrides
+				"tabWidth": 2,
+				"ignoreComments": true,
+				"ignoreUrls": true,
+				"ignoreStrings": true,
+				"ignoreTemplateLiterals": true,
+				"ignoreRegExpLiterals": true
+			}
+		],
 		"arrow-parens": ["error", "as-needed"],
 		"no-async-promise-executor": "off",
 		"no-confusing-arrow": "off",
@@ -49,6 +60,13 @@
 		"no-restricted-syntax": "off",
 		"no-underscore-dangle": "off",
 		"no-floating-decimal": "off",
+		"prefer-const": [
+			"error",
+			{
+				"destructuring": "all",
+				"ignoreReadBeforeAssign": true
+			}
+		],
 		"prefer-destructuring": "off",
 		"no-mixed-operators": "off",
 		"no-return-await": "off",
@@ -58,6 +76,8 @@
 		"no-continue": "off",
 		"camelcase": "off",
 		"eol-last": "off",
+		"no-bitwise": "off",
+		"no-shadow": "off",
 		"import/first": "off",
 		"import/order": "off",
 		"import/prefer-default-export": "off",
@@ -66,13 +86,67 @@
 			"ignorePackages",
 			{
 				"js": "never",
-				"ts": "never"
+				"jsx": "never",
+				"ts": "never",
+				"tsx": "never",
+				"css": "always",
+				"scss": "always",
+				"d.ts": "never"
 			}
 		],
+		"jest/consistent-test-it": [
+			"error",
+			{"fn": "test"}
+		],
+		"jest/prefer-expect-assertions": "off",
+		"jest/expect-expect": "off",
+		"jest/no-hooks": "off",
+		"jest/no-conditional-expect": "off",
+		"jest/no-disabled-tests": "off",
+		"@typescript-eslint/no-shadow": "error",
 		"@typescript-eslint/no-explicit-any": "off",
 		"@typescript-eslint/explicit-module-boundary-types": "off",
 		"@typescript-eslint/no-non-null-assertion": "off"
 	},
+	"overrides": [
+		{
+			"files": ["**/*.js"],
+			"rules": {
+				"no-shadow": "error",
+				"max-len": [
+					"error",
+					{
+						"code": 120,
+						"tabWidth": 4,
+						"ignoreComments": true,
+						"ignoreUrls": true,
+						"ignoreStrings": true,
+						"ignoreTemplateLiterals": true,
+						"ignoreRegExpLiterals": true
+					}
+				],
+				"@typescript-eslint/no-var-requires": "off",
+				"@typescript-eslint/no-shadow": "off"
+			}
+		},
+		{
+			"files": [
+				"**/*.{test,spec}.{j,t}s{,x}",
+				"**/__tests__/**/*.{j,t}s{,x}",
+				"{jest,webpack,babel}/**/*.{j,t}s{,x}"
+			],
+			"rules": {
+				"import/no-extraneous-dependencies": "off"
+			}
+		},
+		{
+			"files": ["scripts/*.{j,t}s{,x}", "codemods/*.{j,t}s{,x}"],
+			"rules": {
+				"no-console": "off",
+				"import/no-extraneous-dependencies": "off"
+			}
+		}
+	],
 	"parser": "@typescript-eslint/parser",
 	"parserOptions": {
 		"ecmaVersion": 6,

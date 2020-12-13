@@ -51,7 +51,7 @@ export default class FacebookAuthenticator extends OAuth2 implements IOAuthProfi
 			ignoreGrantType: true,
 			tokenRequestMethod: TokenRequestMethod.GET,
 			includeStateInAccessToken: false,
-			enablePKCE: true,
+			enablePKCE: false,
 		})
 	}
 }

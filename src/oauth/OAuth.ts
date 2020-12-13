@@ -42,7 +42,7 @@ export default class OAuth implements IOAuthCommon<IOAuthTokenSet> {
 			oauth_callback_confirmed
 		} = qs.parse(await response.text())
 		if (oauth_callback_confirmed !== 'true') throw new Error('Failed to request access token')
-		req.session![sessionKey] = {
+		;(req.session as any)[sessionKey] = {
 			secret: oauth_token_secret
 		}
 		res.status(302).redirect(`${this.config.authorizeUrl}?${qs.stringify({oauth_token})}`)
@@ -78,8 +78,8 @@ export default class OAuth implements IOAuthCommon<IOAuthTokenSet> {
 
 	public async callback(req: Request) {
 		const {oauth_token, oauth_verifier} = req.query
-		const sessionSecret = req.session![sessionKey]?.secret
-		delete req.session![sessionKey]?.secret
+		const sessionSecret = (req.session as any)[sessionKey]?.secret
+		delete (req.session as any)[sessionKey]?.secret
 		if (!sessionSecret) throw new OAuthError('Last token secret lost')
 		const response = await this.signAndFetch(this.config.accessTokenUrl, {
 			oauthHeaders: {

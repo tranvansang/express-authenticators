@@ -45,14 +45,14 @@ export default class LinkedInAuthenticator extends OAuth2 implements IOAuthProfi
 			scope: [
 				'r_emailaddress',
 				'r_liteprofile',
-				'w_member_social'
+				// 'w_member_social'
 			].join(' '),
 			...options,
 		}, {
 			ignoreGrantType: false,
 			tokenRequestMethod: TokenRequestMethod.POST,
 			includeStateInAccessToken: true,
-			enablePKCE: true,
+			enablePKCE: false,
 		})
 	}
 }
