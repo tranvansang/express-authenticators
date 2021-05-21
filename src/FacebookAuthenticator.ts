@@ -3,9 +3,16 @@ import * as qs from 'qs'
 import fetch from 'node-fetch'
 import {IOAuthProfileFetcher, OAuthProfileError} from './OAuthCommon'
 
+// https://developers.facebook.com/docs/facebook-login/manually-build-a-login-flow#token
+interface IFacebookTokenPayload {
+	access_token: string
+	token_type: string
+	expires_in: number
+}
+
 const profilePictureWidth = 1024 //px
 const fetchFacebookProfile = async (
-	token: string,
+	{access_token}: IFacebookTokenPayload,
 	fields = [
 		'first_name',
 		'middle_name',
@@ -17,7 +24,7 @@ const fetchFacebookProfile = async (
 	]
 ) => {
 	const res = await fetch(`https://graph.facebook.com/v9.0/me?${qs.stringify({
-		access_token: token,
+		access_token,
 		fields: fields.join(',')
 	})}`)
 	if (!res.ok) throw new OAuthProfileError(await res.text())
@@ -34,8 +41,11 @@ const fetchFacebookProfile = async (
 	}
 }
 
-export default class FacebookAuthenticator extends OAuth2 implements IOAuthProfileFetcher<string> {
+export default class FacebookAuthenticator
+	extends OAuth2<IFacebookTokenPayload>
+	implements IOAuthProfileFetcher<IFacebookTokenPayload> {
 	fetchProfile = fetchFacebookProfile
+
 	constructor(options: {
 		clientID: string
 		clientSecret: string

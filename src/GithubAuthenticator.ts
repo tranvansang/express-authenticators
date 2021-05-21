@@ -2,19 +2,26 @@ import OAuth2, {TokenRequestMethod} from './oauth2/OAuth2'
 import fetch from 'node-fetch'
 import {IOAuthProfileFetcher, OAuthProfileError} from './OAuthCommon'
 
+// https://docs.github.com/en/developers/apps/building-oauth-apps/authorizing-oauth-apps#response
+interface IGithubTokenPayload {
+	access_token: string
+	token_type: 'bearer'
+	scope: string
+}
+
 export const fetchGithubProfile = async (
-	token: string,
+	{access_token}: IGithubTokenPayload,
 ) => {
 	const res = await fetch('https://api.github.com/user', {
 		headers: {
-			Authorization: `token ${token}`,
+			Authorization: `token ${access_token}`,
 			Accept: 'application/json',
 		}
 	})
 	if (!res.ok) throw new OAuthProfileError(await res.text())
 	const emailRes = await fetch('https://api.github.com/user/emails', {
 		headers: {
-			Authorization: `token ${token}`,
+			Authorization: `token ${access_token}`,
 			Accept: 'application/json',
 		}
 	})
@@ -48,8 +55,11 @@ export const fetchGithubProfile = async (
 	}
 }
 
-export default class GithubAuthenticator extends OAuth2 implements IOAuthProfileFetcher<string> {
+export default class GithubAuthenticator
+	extends OAuth2<IGithubTokenPayload>
+	implements IOAuthProfileFetcher<IGithubTokenPayload> {
 	fetchProfile = fetchGithubProfile
+
 	constructor(options: {
 		clientID: string
 		clientSecret: string

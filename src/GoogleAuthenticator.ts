@@ -3,9 +3,18 @@ import qs from 'qs'
 import fetch from 'node-fetch'
 import {IOAuthProfileFetcher, OAuthProfileError} from './OAuthCommon'
 
+// https://developers.google.com/identity/protocols/oauth2/web-server#exchange-authorization-code
+interface IGoogleTokenPayload {
+	access_token: string
+	expires_in: number
+	refresh_token: string
+	scope: string
+	token_type: 'Bearer'
+}
+
 const profilePictureSize = 1024
 const fetchGoogleProfile = async (
-	token: string,
+	{access_token}: IGoogleTokenPayload,
 	fields = [
 		'emailAddresses',
 		'names',
@@ -15,7 +24,7 @@ const fetchGoogleProfile = async (
 	]
 ) => {
 	const res = await fetch(`https://people.googleapis.com/v1/people/me?${qs.stringify({
-		access_token: token,
+		access_token,
 		personFields: fields.join(',')
 	})}`)
 	if (!res.ok) throw new OAuthProfileError(await res.text())
@@ -83,8 +92,11 @@ const fetchGoogleProfile = async (
 	}
 }
 
-export default class GoogleAuthenticator extends OAuth2 implements IOAuthProfileFetcher<string> {
+export default class GoogleAuthenticator
+	extends OAuth2<IGoogleTokenPayload>
+	implements IOAuthProfileFetcher<IGoogleTokenPayload> {
 	fetchProfile = fetchGoogleProfile
+
 	constructor(private childConfig: {
 		clientID: string
 		clientSecret: string

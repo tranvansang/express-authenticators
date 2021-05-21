@@ -3,11 +3,16 @@ import * as qs from 'qs'
 import fetch from 'node-fetch'
 import {IOAuthProfileFetcher, OAuthProfileError} from './OAuthCommon'
 
+// https://developer.foursquare.com/docs/places-api/authentication/#step-3
+interface IFoursquareTokenPayload {
+	access_token: string
+}
+
 const fetchFoursquareProfile = async (
-	token: string,
+	{access_token}: IFoursquareTokenPayload,
 ) => {
 	const res = await fetch(`https://api.foursquare.com/v2/users/self?${qs.stringify({
-		oauth_token: token,
+		oauth_token: access_token,
 		v: '20200408'
 	})}`)
 	if (!res.ok) throw new OAuthProfileError(await res.text())
@@ -26,8 +31,11 @@ const fetchFoursquareProfile = async (
 	}
 }
 
-export default class FoursquareAuthenticator extends OAuth2 implements IOAuthProfileFetcher<string> {
+export default class FoursquareAuthenticator
+	extends OAuth2<IFoursquareTokenPayload>
+	implements IOAuthProfileFetcher<IFoursquareTokenPayload> {
 	fetchProfile = fetchFoursquareProfile
+
 	constructor(options: {
 		clientID: string
 		clientSecret: string

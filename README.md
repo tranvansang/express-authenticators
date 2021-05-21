@@ -5,7 +5,7 @@
 Third party authenticator module re-written in Typescript
 
 - Zero dependency OAuth and OAuth2 implementations in Typescript.
-- Support fetching user profile for various providers: Google, Facebook, Twitter, Instagram, Tumblr, Github, LinkedIn, Pinterest, Foursquare.
+- Support fetching user profile for various providers: Google, Facebook, Twitter, Instagram, Tumblr, Github, LinkedIn, Pinterest, Foursquare, LINE.
 - Support PKCE([Proof Key for Code Exchange](https://oauth.net/2/pkce/)).
 
 # Usage
@@ -22,6 +22,7 @@ const {
 	FoursquareAuthenticator,
 	GithubAuthenticator,
 	GoogleAuthenticator,
+	LineAuthenticator,
 	InstagramAuthenticator,
 	LinkedInAuthenticator,
 	PinterestAuthenticator,
@@ -57,8 +58,8 @@ app.get('/auth/facebook', facebookAuth.authenticate)
 app.get(
 	`/auth/facebook/callback`,
 	asyncMiddleware(async (req, res) => {
-		const token = await facebookAuth.callback(req)
-		const profile = await facebookAuth.fetchProfile(token)
+		const payload = await facebookAuth.callback(req)
+		const profile = await facebookAuth.fetchProfile(payload)
 		console.log('got profile', profile)
 		res.send(JSON.stringify(profile))
 	})
@@ -71,7 +72,7 @@ This module requires `express-session` middleware to be applied before.
 
 Exported classes:
 
-- `FacebookAuthenticator`, `FoursquareAuthenticator`, `GithubAuthenticator`, `GoogleAuthenticator`, `InstagramAuthenticator`, `LinkedInAuthenticator`, `PinterestAuthenticator`, `TumblrAuthenticator`, `TwitterAuthenticator`.
+- `FacebookAuthenticator`, `FoursquareAuthenticator`, `GithubAuthenticator`, `GoogleAuthenticator`, `InstagramAuthenticator`, `LinkedInAuthenticator`, `PinterestAuthenticator`, `TumblrAuthenticator`, `TwitterAuthenticator`, `LineAuthenticator`.
 	
 	All these classes have a same interface, they all inherit OAuth2 or OAuth classes
 	

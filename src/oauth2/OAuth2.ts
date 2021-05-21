@@ -11,10 +11,11 @@ const sessionKey = 'oauth2'
 
 export enum TokenRequestMethod {
 	GET = 'GET',
-	POST = 'POST'
+	POST = 'POST',
+	PUT = 'PUT'
 }
 
-export default class OAuth2 implements IOAuthCommon<string> {
+export default class OAuth2<T> implements IOAuthCommon<T> {
 	// eslint-disable-next-line no-useless-constructor
 	constructor(
 		private config: {

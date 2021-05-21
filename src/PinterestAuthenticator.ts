@@ -1,14 +1,37 @@
 import OAuth2, {TokenRequestMethod} from './oauth2/OAuth2'
-import * as qs from 'qs'
 import fetch from 'node-fetch'
 import {IOAuthProfileFetcher, OAuthProfileError} from './OAuthCommon'
 
+// https://developers.pinterest.com/docs/redoc/martech/#section/User-Authorization/Exchange-the-code-for-an-access-token
+interface IPinterestTokenPayload {
+	status: 'success'
+	message: 'ok'
+	code: 0
+	data: {
+		access_token: string
+		expires_at: number
+		consumer_id: string | number
+		token_type: 'bearer'
+		authorized: true
+		scope: string
+	}
+}
+
 const fetchPinterestProfile = async (
-	token: string,
+	{data: {access_token}}: IPinterestTokenPayload,
 ) => {
-	const res = await fetch(`https://api.pinterest.com/v1/me?${qs.stringify({access_token: token})}`)
+	const res = await fetch(
+		'https://api.pinterest.com/v3/users/me',
+		{
+			headers: {
+				Authorization: `Bearer ${access_token}`
+			}
+		}
+	)
 	if (!res.ok) throw new OAuthProfileError(await res.text())
-	const profile = await res.json()
+	const {data: profile} = await res.json()
+	// Pinterest does not include response shape in document
+	// https://developers.pinterest.com/docs/redoc/martech/#operation/v3_get_user_handler_GET
 	if (!profile.id) throw new OAuthProfileError('Invalid Pinterest profile')
 	return {
 		id: profile.id,
@@ -18,8 +41,11 @@ const fetchPinterestProfile = async (
 	}
 }
 
-export default class PinterestAuthenticator extends OAuth2 implements IOAuthProfileFetcher<string> {
+export default class PinterestAuthenticator
+	extends OAuth2<IPinterestTokenPayload>
+	implements IOAuthProfileFetcher<IPinterestTokenPayload> {
 	fetchProfile = fetchPinterestProfile
+
 	constructor(options: {
 		clientID: string
 		clientSecret: string
@@ -27,13 +53,13 @@ export default class PinterestAuthenticator extends OAuth2 implements IOAuthProf
 		scope?: string
 	}) {
 		super({
-			consentURL: 'https://api.pinterest.com/oauth',
-			tokenURL: 'https://api.pinterest.com/v1/oauth/token',
-			scope: 'read_public',
+			consentURL: 'https://www.pinterest.com/oauth',
+			tokenURL: 'https://api.pinterest.com/v3/oauth/access_token',
+			scope: 'read_users',
 			...options,
 		}, {
 			ignoreGrantType: false,
-			tokenRequestMethod: TokenRequestMethod.POST,
+			tokenRequestMethod: TokenRequestMethod.PUT,
 			includeStateInAccessToken: false,
 			enablePKCE: false,
 		})

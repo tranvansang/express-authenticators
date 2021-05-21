@@ -3,8 +3,14 @@ import fetch from 'node-fetch'
 import {IOAuthProfileFetcher, OAuthProfileError} from './OAuthCommon'
 import qs from 'qs'
 
+// https://developers.facebook.com/docs/instagram-basic-display-api/reference/oauth-access-token
+interface IInstagramTokenPayload {
+	access_token: string
+	user_id: string
+}
+
 const fetchInstagramProfile = async (
-	token: string,
+	{access_token}: IInstagramTokenPayload,
 	fields = [
 		'account_type',
 		'id',
@@ -13,7 +19,7 @@ const fetchInstagramProfile = async (
 	]
 ) => {
 	const res = await fetch(`https://graph.instagram.com/me?${qs.stringify({
-		access_token: token,
+		access_token,
 		fields: fields.join(',')
 	})}`, {
 		headers: {
@@ -41,8 +47,11 @@ const fetchInstagramProfile = async (
 	}
 }
 
-export default class InstagramAuthenticator extends OAuth2 implements IOAuthProfileFetcher<string> {
+export default class InstagramAuthenticator
+	extends OAuth2<IInstagramTokenPayload>
+	implements IOAuthProfileFetcher<IInstagramTokenPayload> {
 	fetchProfile = fetchInstagramProfile
+
 	constructor(options: {
 		clientID: string
 		clientSecret: string
