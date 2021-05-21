@@ -7,6 +7,7 @@ import LinkedInAuthenticator from './LinkedInAuthenticator'
 import PinterestAuthenticator from './PinterestAuthenticator'
 import TumblrAuthenticator from './TumblrAuthenticator'
 import TwitterAuthenticator from './TwitterAuthenticator'
+import LineAuthenticator from './LineAuthenticator'
 import OAuth from './oauth/OAuth'
 import OAuth2 from './oauth2/OAuth2'
 
@@ -20,6 +21,7 @@ export {
 	PinterestAuthenticator,
 	TumblrAuthenticator,
 	TwitterAuthenticator,
+	LineAuthenticator,
 	OAuth2,
 	OAuth
 }

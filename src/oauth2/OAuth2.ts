@@ -91,7 +91,10 @@ export default class OAuth2<T> implements IOAuthCommon<T> {
 
 	public authenticate(req: Request, res: Response) {
 		const state = v4()
-		const verifier = v4()
+		// https://datatracker.ietf.org/doc/html/rfc7636#section-4.1
+		// rfc7636 requires key length between 43-128
+		// while v4's generated key has 36 char
+		const verifier = `${v4()}-${v4()}`
 		;(req.session as any)[sessionKey] = {state, verifier}
 		res.status(302).redirect(`${this.config.consentURL}?\
 ${qs.stringify({
