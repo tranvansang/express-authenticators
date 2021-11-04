@@ -1,7 +1,7 @@
 import OAuth2, {TokenRequestMethod} from './oauth2/OAuth2'
-import * as qs from 'qs'
 import fetch from 'node-fetch'
 import {IOAuthProfileFetcher, OAuthProfileError} from './OAuthCommon'
+import * as querystring from 'querystring'
 
 // https://developer.foursquare.com/docs/places-api/authentication/#step-3
 interface IFoursquareTokenPayload {
@@ -11,7 +11,7 @@ interface IFoursquareTokenPayload {
 const fetchFoursquareProfile = async (
 	{access_token}: IFoursquareTokenPayload,
 ) => {
-	const res = await fetch(`https://api.foursquare.com/v2/users/self?${qs.stringify({
+	const res = await fetch(`https://api.foursquare.com/v2/users/self?${querystring.stringify({
 		oauth_token: access_token,
 		v: '20200408'
 	})}`)

@@ -37,7 +37,6 @@
   "dependencies": {
     "middleware-async": "^1.3.1",
     "node-fetch": "^2.6.1",
-    "qs": "^6.10.1",
     "r3986": "^0.0.3",
     "uuid": "^8.3.2"
   },

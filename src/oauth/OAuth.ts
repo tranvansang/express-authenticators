@@ -1,5 +1,4 @@
 import fetch from 'node-fetch'
-import qs from 'qs'
 import {getNonce, getTimestamp, oauthSign, OAuthSigningMethod} from './oauthUtils'
 // eslint-disable-next-line import/no-unresolved
 import type {Request, Response} from 'express'
@@ -7,6 +6,7 @@ import OAuthError from './OAuthError'
 import r3986 from 'r3986'
 import {IOAuthCommon} from '../OAuthCommon'
 import asyncMiddleware from 'middleware-async'
+import querystring from 'querystring'
 
 type IHttpMethod = 'POST' | 'GET'
 const version = '1.0'
@@ -40,12 +40,12 @@ export default class OAuth implements IOAuthCommon<IOAuthTokenSet> {
 			oauth_token,
 			oauth_token_secret,
 			oauth_callback_confirmed
-		} = qs.parse(await response.text())
+		} = querystring.parse(await response.text())
 		if (oauth_callback_confirmed !== 'true') throw new Error('Failed to request access token')
 		;(req.session as any)[sessionKey] = {
 			secret: oauth_token_secret
 		}
-		res.status(302).redirect(`${this.config.authorizeUrl}?${qs.stringify({oauth_token})}`)
+		res.status(302).redirect(`${this.config.authorizeUrl}?${querystring.stringify({oauth_token})}`)
 	})
 
 	// eslint-disable-next-line no-useless-constructor
@@ -66,13 +66,13 @@ export default class OAuth implements IOAuthCommon<IOAuthTokenSet> {
 		options: IOAuthRequestOptions,
 		tokenSet?: IOAuthTokenSet
 	) {
-		return fetch(`${url}${options.qs ? `?${qs.stringify(options.qs)}` : ''}`, {
+		return fetch(`${url}${options.qs ? `?${querystring.stringify(options.qs)}` : ''}`, {
 			headers: {
 				...options.headers,
 				Authorization: this.authorizationHeader(url, options, tokenSet),
 			},
 			method: options.method,
-			body: options.body && qs.stringify(options.body),
+			body: options.body && querystring.stringify(options.body),
 		})
 	}
 
@@ -98,7 +98,7 @@ export default class OAuth implements IOAuthCommon<IOAuthTokenSet> {
 			user_id,
 			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			screen_name
-		} = qs.parse(await response.text())
+		} = querystring.parse(await response.text())
 		return {
 			token: token as string,
 			secret: secret as string

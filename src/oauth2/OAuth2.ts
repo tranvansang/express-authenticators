@@ -1,11 +1,11 @@
 // eslint-disable-next-line import/no-unresolved
 import {Request, Response} from 'express'
 import {v4} from 'uuid'
-import * as qs from 'qs'
 import fetch from 'node-fetch'
 import {IOAuthCommon} from '../OAuthCommon'
 import OAuth2Error from './OAuth2Error'
 import crypto from 'crypto'
+import querystring from 'querystring'
 
 const sessionKey = 'oauth2'
 
@@ -58,7 +58,7 @@ export default class OAuth2<T> implements IOAuthCommon<T> {
 			throw error
 		}
 		const code = req.query.code
-		const body = qs.stringify({
+		const body = querystring.stringify({
 			client_id: this.config.clientID,
 			redirect_uri: this.config.redirectUri,
 			client_secret: this.config.clientSecret,
@@ -97,7 +97,7 @@ export default class OAuth2<T> implements IOAuthCommon<T> {
 		const verifier = `${v4()}-${v4()}`
 		;(req.session as any)[sessionKey] = {state, verifier}
 		res.status(302).redirect(`${this.config.consentURL}?\
-${qs.stringify({
+${querystring.stringify({
 		client_id: this.config.clientID,
 		redirect_uri: this.config.redirectUri,
 		state,

@@ -1,7 +1,7 @@
 import OAuth2, {TokenRequestMethod} from './oauth2/OAuth2'
-import qs from 'qs'
 import fetch from 'node-fetch'
 import {IOAuthProfileFetcher, OAuthProfileError} from './OAuthCommon'
+import querystring from 'querystring'
 
 // https://developers.line.biz/en/reference/line-login/#oauth
 interface ILineTokenPayload {
@@ -33,7 +33,7 @@ export default class GoogleAuthenticator
 				'https://api.line.me/oauth2/v2.1/verify',
 				{
 					method: 'POST',
-					body: qs.stringify({
+					body: querystring.stringify({
 						id_token,
 						client_id: this.childConfig.clientID
 					}),
@@ -107,7 +107,7 @@ export default class GoogleAuthenticator
 				'Content-Type': 'application/x-www-form-urlencoded',
 				Accept: 'application/json',
 			},
-			body: qs.stringify({
+			body: querystring.stringify({
 				client_id: this.childConfig.clientID,
 				client_secret: this.childConfig.clientSecret,
 				grant_type: 'refresh_token',

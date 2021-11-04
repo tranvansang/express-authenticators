@@ -1,7 +1,7 @@
 import OAuth2, {TokenRequestMethod} from './oauth2/OAuth2'
-import * as qs from 'qs'
 import fetch from 'node-fetch'
 import {IOAuthProfileFetcher, OAuthProfileError} from './OAuthCommon'
+import * as querystring from 'querystring'
 
 // https://developers.facebook.com/docs/facebook-login/manually-build-a-login-flow#token
 interface IFacebookTokenPayload {
@@ -23,7 +23,7 @@ const fetchFacebookProfile = async (
 		'name'
 	]
 ) => {
-	const res = await fetch(`https://graph.facebook.com/v9.0/me?${qs.stringify({
+	const res = await fetch(`https://graph.facebook.com/v9.0/me?${querystring.stringify({
 		access_token,
 		fields: fields.join(',')
 	})}`)
