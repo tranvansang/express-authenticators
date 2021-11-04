@@ -10,6 +10,7 @@ export enum OAuthSigningMethod {
 	Plain = 'PLAINTEXT',
 	Rsa = 'RSA-SHA1',
 }
+
 export const oauthSign = (method: OAuthSigningMethod, base: string, consumerSecret: string, tokenSecret?: string) => {
 	switch (method) {
 		case OAuthSigningMethod.Hmac:

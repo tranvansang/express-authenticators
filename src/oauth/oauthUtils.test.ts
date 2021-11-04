@@ -36,11 +36,17 @@ UXLMJQKBgQDCbS1bjn9sj0YOzyJUMmyycgHwP4eKNdXexA7uD0dmEW7wI+tYXO4W
 1HG5hOqK9uCwWc+2+pY54kFdWw/oENOZ1Ak/deEdmVg/IBeC4G2Xqw==
 -----END RSA PRIVATE KEY-----`
 		const rsaHash = 'dXlCkWByu47qiqVnADfMVa+U7QShGtCuCc2t0nnwTUg7Xv+qF0MAnWR6wIVbsaljMZ3Lm9e+G8lZfW1yG2AXeZRZ6OKn45vRIF7lNiQlvVlvbeuEb3dZpOhKu9FN4tf8ameI/gRobfUjP6P8jf3UMow4K1tNZPQvNpJgOU+huyd1DMjj7BR6jhP3/WYnOnGrxUIvsj58zLm3TrloKJynPAXkGAxjs+QaZseHC/ypXG/AAATEjxZ2gToNkQSFniWW33JkF2cGYnKXtLDWeIvZ4jlYveJ0jCPL3E+gJ2V1Z3xxuRPNi6XFZdnk5kTOM1Dd9ObwcBpCysvWOM8f9DPDcA=='
-		expect(oauthSign(OAuthSigningMethod.Hmac, plain, key)).toBe('kUgwfI+iYiIX16qESLvAGQKlwOI=')
-		expect(oauthSign(OAuthSigningMethod.Hmac, plain, key, tokenSecret)).toBe('IQlp+mZNGS+vTcvjPJbJj7r30LI=')
-		expect(oauthSign(OAuthSigningMethod.Plain, plain, key)).toBe(encodeURIComponent(key) + '&')
-		expect(oauthSign(OAuthSigningMethod.Plain, plain, key, tokenSecret)).toBe(encodeURIComponent(key) + '&' + encodeURIComponent(tokenSecret))
-		expect(oauthSign(OAuthSigningMethod.Rsa, plain, pemKey)).toBe(rsaHash)
-		expect(oauthSign(OAuthSigningMethod.Rsa, plain, pemKey, tokenSecret)).toBe(rsaHash)
+		expect(oauthSign(OAuthSigningMethod.Hmac, plain, key))
+			.toBe('kUgwfI+iYiIX16qESLvAGQKlwOI=')
+		expect(oauthSign(OAuthSigningMethod.Hmac, plain, key, tokenSecret))
+			.toBe('IQlp+mZNGS+vTcvjPJbJj7r30LI=')
+		expect(oauthSign(OAuthSigningMethod.Plain, plain, key))
+			.toBe(`${encodeURIComponent(key)}&`)
+		expect(oauthSign(OAuthSigningMethod.Plain, plain, key, tokenSecret))
+			.toBe(`${encodeURIComponent(key)}&${encodeURIComponent(tokenSecret)}`)
+		expect(oauthSign(OAuthSigningMethod.Rsa, plain, pemKey))
+			.toBe(rsaHash)
+		expect(oauthSign(OAuthSigningMethod.Rsa, plain, pemKey, tokenSecret))
+			.toBe(rsaHash)
 	})
 })

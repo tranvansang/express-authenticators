@@ -1,6 +1,6 @@
-import OAuth2, {TokenRequestMethod} from './oauth2/OAuth2'
+import OAuth2, {TokenRequestMethod} from '../oauth2/OAuth2'
 import fetch from 'node-fetch'
-import {IOAuthProfileFetcher, OAuthProfileError} from './OAuthCommon'
+import {IOAuthProfileFetcher, OAuthProfileError} from '../OAuthCommon'
 import querystring from 'querystring'
 
 // https://developers.line.biz/en/reference/line-login/#oauth
@@ -16,6 +16,29 @@ interface ILineTokenPayload {
 export default class GoogleAuthenticator
 	extends OAuth2<ILineTokenPayload>
 	implements IOAuthProfileFetcher<ILineTokenPayload> {
+	constructor(private childConfig: {
+		clientID: string
+		clientSecret: string
+		redirectUri: string
+		scope?: string
+	}) {
+		super({
+			consentURL: 'https://access.line.me/oauth2/v2.1/authorize',
+			tokenURL: 'https://api.line.me/oauth2/v2.1/token',
+			scope: [
+				'profile',
+				'openid', // if 'openid' scope is not included, `ignoreEmail` must be false when calling `fetchProfile`
+				'openid%20email' // exclude this scope if app is not permitted to access user email
+			].join(' '),
+			...childConfig,
+		}, {
+			ignoreGrantType: false,
+			tokenRequestMethod: TokenRequestMethod.POST,
+			includeStateInAccessToken: false,
+			enablePKCE: true,
+		})
+	}
+
 	async fetchProfile(
 		{
 			access_token,
@@ -75,29 +98,6 @@ export default class GoogleAuthenticator
 			last: rest?.join(' '),
 			raw: profile
 		}
-	}
-
-	constructor(private childConfig: {
-		clientID: string
-		clientSecret: string
-		redirectUri: string
-		scope?: string
-	}) {
-		super({
-			consentURL: 'https://access.line.me/oauth2/v2.1/authorize',
-			tokenURL: 'https://api.line.me/oauth2/v2.1/token',
-			scope: [
-				'profile',
-				'openid', // if 'openid' scope is not included, `ignoreEmail` must be false when calling `fetchProfile`
-				'openid%20email' // exclude this scope if app is not permitted to access user email
-			].join(' '),
-			...childConfig,
-		}, {
-			ignoreGrantType: false,
-			tokenRequestMethod: TokenRequestMethod.POST,
-			includeStateInAccessToken: false,
-			enablePKCE: true,
-		})
 	}
 
 	async refreshAccessToken(refreshToken: string) {

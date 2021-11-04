@@ -1,8 +1,8 @@
-import OAuth, {IOAuthTokenSet} from './oauth/OAuth'
-import {OAuthSigningMethod} from './oauth/oauthUtils'
-import {IOAuthProfileFetcher, OAuthProfileError} from './OAuthCommon'
+import OAuth, {IOAuthTokenPayload} from '../oauth/OAuth'
+import {OAuthSigningMethod} from '../oauth/oauthUtils'
+import {IOAuthProfileFetcher, OAuthProfileError} from '../OAuthCommon'
 
-export default class TwitterAuthenticator extends OAuth implements IOAuthProfileFetcher<IOAuthTokenSet> {
+export default class TwitterAuthenticator extends OAuth implements IOAuthProfileFetcher<IOAuthTokenPayload> {
 	constructor(config: {
 		clientID: string
 		clientSecret: string
@@ -19,13 +19,13 @@ export default class TwitterAuthenticator extends OAuth implements IOAuthProfile
 		})
 	}
 
-	async fetchProfile(tokenSet: IOAuthTokenSet) {
+	async fetchProfile(tokenPayload: IOAuthTokenPayload) {
 		const response = await this.signAndFetch(
 			'https://api.twitter.com/1.1/account/verify_credentials.json',
 			{
-				qs: { include_email: true},
+				qs: {include_email: true},
 			},
-			tokenSet
+			tokenPayload
 		)
 		if (!response.ok) throw new OAuthProfileError(await response.text())
 		const profile = await response.json()

@@ -2,18 +2,28 @@
 
 [![NPM](https://nodei.co/npm/express-authenticators.png)](https://nodei.co/npm/express-authenticators/)
 
-Third party authenticator module re-written in Typescript
+Modern OAuth/OAuth2 authenticator.
 
-- Zero dependency OAuth and OAuth2 implementations in Typescript.
-- Support fetching user profile for various providers: Google, Facebook, Twitter, Instagram, Tumblr, Github, LinkedIn, Pinterest, Foursquare, LINE.
+## Features
+
+- Pre-configured for popular providers: Google, Facebook, Foursquare, Github, Twitter, LinkedIn, LINE, Pinterest,
+  Tumblr, Instagram.
+- Pre-configured for popular scopes: email, profile, etc. with account fetching for basic user information.
+- The original OAuth/OAuth2 classes are available for customized providers.
+- The only dependencies are `r3986` and `node-fetch`.
+- Modern NodeJS. Although, it requires NodeJS >= v14.17.0 to use the `randomUUID()` function.
+- Strongly typed with TypeScript.
 - Support PKCE([Proof Key for Code Exchange](https://oauth.net/2/pkce/)).
+- Generic and pure interface. Do not depend on any framework.
 
 # Usage
 
 - With `yarn`: `yarn add express-authenticators`.
 - With `npm`: `npm install --save express-authenticators`.
 
-## Sample code
+Note: before `v0.1.0`, this package was for ExpressJS only, hence its name is `express-authenticators`.
+
+## Sample code in ExpressJS
 
 ```javascript
 
@@ -28,12 +38,12 @@ const {
 	PinterestAuthenticator,
 	TumblrAuthenticator,
 	TwitterAuthenticator,
+	LineAuthenticator,
 	OAuth2,
 	OAuth
 } = require('express-authenticators')
 const express = require('express')
 const session = require('express-session')
-const asyncMiddleware = require('middleware-async').default
 
 const app = express()
 app.use(session())
@@ -46,45 +56,95 @@ const facebookAuth = new FacebookAuthenticator({
 
 app.get(
 	'/auth/facebook',
-	(req, res, next) => {
+	async (req, res, next) => {
 		req.session.someInfo = 'my info' // store the user credential
-		facebookAuth.authenticate(req, res, next)
+		try {
+			const redirectUrl = await facebookAuth.authenticate({
+				store(token) {
+					req.session.oauthFacebook = token
+				}
+			})
+			res.status = 302
+			res.redirect(redirectUrl)
+		} catch (e) {
+			next(e)
+		}
 	}
-/*
-or
-app.get('/auth/facebook', facebookAuth.authenticate)
-*/
 )
 app.get(
 	`/auth/facebook/callback`,
-	asyncMiddleware(async (req, res) => {
-		const payload = await facebookAuth.callback(req)
-		const profile = await facebookAuth.fetchProfile(payload)
-		console.log('got profile', profile)
-		res.send(JSON.stringify(profile))
-	})
+	async (req, res, next) => {
+		try {
+			const payload = await facebookAuth.callback(req.session.oauthFacebook, new URL(req.url).search)
+			const profile = await facebookAuth.fetchProfile(payload)
+			console.log('got profile', profile)
+			res.send(JSON.stringify(profile))
+		} catch (e) {
+			next(e)
+		}
+	}
 )
-
 ```
+
 # API references
 
-This module requires `express-session` middleware to be applied before.
+Note that NodeJS >= v14.17.0 is required.
 
-Exported classes:
+## Exported classes
 
-- `FacebookAuthenticator`, `FoursquareAuthenticator`, `GithubAuthenticator`, `GoogleAuthenticator`, `InstagramAuthenticator`, `LinkedInAuthenticator`, `PinterestAuthenticator`, `TumblrAuthenticator`, `TwitterAuthenticator`, `LineAuthenticator`.
-	
-	All these classes have a same interface, they all inherit OAuth2 or OAuth classes
-	
+- 2 generic classes: `OAuth2` and `OAuth`.
+
+- Pre-configured providers that inherit `OAuth`: `TwitterAuthenticator`, `TumblrAuthenticator`.
+- Pre-configured providers that inherit `OAuth2`:
+    - `FacebookAuthenticator`
+    - `FoursquareAuthenticator`
+    - `GithubAuthenticator`
+    - `GoogleAuthenticator`
+    - `InstagramAuthenticator`
+    - `LinkedInAuthenticator`
+    - `PinterestAuthenticator`
+    - `LineAuthenticator`
+
+## Constructors
+
+- All pre-configured providers' constructors take only one parameter: `options` with the following properties.
+
 ```typescript
-constructor(option: {
-    clientID: 'app id',
-    clientSecret: 'app secret',
-    redirectUri: `https://example.com/auth/<provider>/callback`
-})
-authenticate(req: Request, res: Response): Promise<void> | void // async middleware
-callback(req: Request): Promise<TokenType> | TokenType
-fetchProfile(tokenSet: TokenType): Promise<{
+{
+	clientID: string
+	clientSecret: string
+	redirectUri: string
+}
+```
+
+## Most generic methods
+
+All exported classes inherit the `IOAuthCommon` interface which has the following methods:
+
+- `authenticate(session: {store(token: string): void | Promise<void>}): string | Promise<string>`.
+    - Input: this method takes only one argument, `session` whose `store` method is called with a token in `string` type
+      to store in the request session. This data will be required in the succeeding `callback()` method.
+    - Output: redirect url. The controller/router should redirect the user to this url. This function always returns
+      a `string` type or throws an error if it fails.
+
+- `callback({pop}: {pop(): string | undefined}, rawQuery: string)`:
+    - Input: `pop` is a function that returns the token from the request session. This token is required to validate the
+      authentication.
+    - Input: `query` is the query string from the callback url.
+    - Output: the token payload returned from the provider. For `OAuth` providers, this
+      is `{token: string, secret: string}`. For `OAuth2` providers, the payload is the JSON-parsed response from the
+      provider which usually contains the token for further request.
+
+## Pre-configured providers' methods
+
+Pre-configured providers have the following methods:
+
+- `fetchProfile(tokenPayload): Promise<IOAuthProfile>`: takes the token payload returned from the `callback()` method
+  and returns the profile data. Although each provider returns different data, they are all pre-configured in this
+  library to return the `IOAuthProfile` described below.
+
+```typescript
+export interface IOAuthProfile {
 	id?: string
 	email?: string
 	emailVerified?: boolean
@@ -92,30 +152,26 @@ fetchProfile(tokenSet: TokenType): Promise<{
 	last?: string
 	avatar?: string
 	raw: any
-}>
+}
 ```
 
-`authenticate`: redirect middleware
-If there is no error, this middleware will redirect the user to the provider website.
-Eventually, redirect back to our pre-configured `redirectUri` with appropriate user privilege.
+Where `raw` is the raw JSON-parsed data returned from the provider. Other fields are calculated **carefully** based on
+the data returned from the provider.
 
-`callback`: take the request and return a promise which returns a token for profile fetching.
-This function should be called in the callback url handler. Check example at the end of this readme.
+## Customized provider
 
-`fetchProfile`: provider-specific profile fetcher using the token returned by `callback`.
+While I recommend you using the pre-configured providers, you can also create your own customized provider by extending
+the `OAuth`/`OAuth2` classes or initialize a new instance of the `OAuth`/`OAuth2` classes directly.
 
-
-- `OAuth2`, `OAuth`
-	
-In principle these classes have `authenticate` and `callback` methods.
-However, I recommend you use the provider-specific classes described above.
-If you need an additional provider, clone the other providers' implementations then make your own.
-
-Here are two sample implementations of `FacebookAuthenticator` (`OAuth2`), and `TwitterAuthenticator` (`OAuth`)
+Here are two sample implementations of `FacebookAuthenticator` (extending `OAuth2`), and `TwitterAuthenticator` (
+extending `OAuth`)
 
 ```typescript
-class FacebookAuthenticator extends OAuth2 implements IOAuthProfileFetcher<string> {
-	fetchProfile = fetchFacebookProfile //make your own profile fetcher
+class FacebookAuthenticator
+	extends OAuth2<IFacebookTokenPayload>
+	implements IOAuthProfileFetcher<IFacebookTokenPayload> {
+	fetchProfile = fetchFacebookProfile
+
 	constructor(options: {
 		clientID: string
 		clientSecret: string
@@ -123,18 +179,20 @@ class FacebookAuthenticator extends OAuth2 implements IOAuthProfileFetcher<strin
 		scope?: string
 	}) {
 		super({
-			consentURL: 'https://www.facebook.com/v6.0/dialog/oauth',
-			tokenURL: 'https://graph.facebook.com/v6.0/oauth/access_token',
+			consentURL: 'https://www.facebook.com/v9.0/dialog/oauth',
+			tokenURL: 'https://graph.facebook.com/v9.0/oauth/access_token',
 			scope: ['email'].join(','),
 			...options,
 		}, {
 			ignoreGrantType: true,
 			tokenRequestMethod: TokenRequestMethod.GET,
-			includeStateInAccessToken: false
+			includeStateInAccessToken: false,
+			enablePKCE: false,
 		})
 	}
 }
-class TwitterAuthenticator extends OAuth implements IOAuthProfileFetcher<IOAuthTokenSet> {
+
+export default class TwitterAuthenticator extends OAuth implements IOAuthProfileFetcher<IOAuthTokenPayload> {
 	constructor(config: {
 		clientID: string
 		clientSecret: string
@@ -151,14 +209,13 @@ class TwitterAuthenticator extends OAuth implements IOAuthProfileFetcher<IOAuthT
 		})
 	}
 
-	async fetchProfile(tokenSet: IOAuthTokenSet){
-    //make use of this.signAndFetch and make your own profile fetcher
+	async fetchProfile(tokenPayload: IOAuthTokenPayload) {
 		const response = await this.signAndFetch(
 			'https://api.twitter.com/1.1/account/verify_credentials.json',
 			{
-				qs: { include_email: true},
+				qs: {include_email: true},
 			},
-			tokenSet
+			tokenPayload
 		)
 		if (!response.ok) throw new OAuthProfileError(await response.text())
 		const profile = await response.json()
@@ -175,8 +232,11 @@ class TwitterAuthenticator extends OAuth implements IOAuthProfileFetcher<IOAuthT
 			emailVerified: !!profile.email,
 			/**
 			 * from twitter docs
-			 * https://developer.twitter.com/en/docs/accounts-and-users/manage-account-settings/api-reference/get-account-verify_credentials
-			 * When set to true email will be returned in the user objects as a string. If the user does not have an email address on their account, or if the email address is not verified, null will be returned.
+			 * https://developer.twitter.com/en/docs/accounts-and-users
+			 * /manage-account-settings/api-reference/get-account-verify_credentials
+			 * When set to true email will be returned in the user objects as a string.
+			 * If the user does not have an email address on their account,
+			 * or if the email address is not verified, null will be returned.
 			 */
 		}
 	}

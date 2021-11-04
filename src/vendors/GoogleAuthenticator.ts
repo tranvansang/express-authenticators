@@ -1,6 +1,6 @@
-import OAuth2, {TokenRequestMethod} from './oauth2/OAuth2'
+import OAuth2, {TokenRequestMethod} from '../oauth2/OAuth2'
 import fetch from 'node-fetch'
-import {IOAuthProfileFetcher, OAuthProfileError} from './OAuthCommon'
+import {IOAuthProfileFetcher, OAuthProfileError} from '../OAuthCommon'
 import querystring from 'querystring'
 
 // https://developers.google.com/identity/protocols/oauth2/web-server#exchange-authorization-code

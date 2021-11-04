@@ -1,6 +1,6 @@
-import OAuth2, {TokenRequestMethod} from './oauth2/OAuth2'
+import OAuth2, {TokenRequestMethod} from '../oauth2/OAuth2'
 import fetch from 'node-fetch'
-import {IOAuthProfileFetcher, OAuthProfileError} from './OAuthCommon'
+import {IOAuthProfileFetcher, OAuthProfileError} from '../OAuthCommon'
 
 // https://docs.github.com/en/developers/apps/building-oauth-apps/authorizing-oauth-apps#response
 interface IGithubTokenPayload {

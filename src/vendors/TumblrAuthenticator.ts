@@ -1,8 +1,8 @@
-import OAuth, {IOAuthTokenSet} from './oauth/OAuth'
-import {OAuthSigningMethod} from './oauth/oauthUtils'
-import {IOAuthProfileFetcher, OAuthProfileError} from './OAuthCommon'
+import OAuth, {IOAuthTokenPayload} from '../oauth/OAuth'
+import {OAuthSigningMethod} from '../oauth/oauthUtils'
+import {IOAuthProfileFetcher, OAuthProfileError} from '../OAuthCommon'
 
-export default class TumblrAuthenticator extends OAuth implements IOAuthProfileFetcher<IOAuthTokenSet> {
+export default class TumblrAuthenticator extends OAuth implements IOAuthProfileFetcher<IOAuthTokenPayload> {
 	constructor(config: {
 		clientID: string
 		clientSecret: string
@@ -19,11 +19,11 @@ export default class TumblrAuthenticator extends OAuth implements IOAuthProfileF
 		})
 	}
 
-	async fetchProfile(tokenSet: IOAuthTokenSet) {
+	async fetchProfile(tokenPayload: IOAuthTokenPayload) {
 		const response = await this.signAndFetch(
 			'https://api.tumblr.com/v2/user/info',
 			{},
-			tokenSet
+			tokenPayload
 		)
 		if (!response.ok) throw new OAuthProfileError(await response.text())
 		const profile = await response.json()
@@ -32,7 +32,7 @@ export default class TumblrAuthenticator extends OAuth implements IOAuthProfileF
 			const blogResponse = await this.signAndFetch(
 				`https://api.tumblr.com/v2/blog/${profile.response.user.name}.tumblr.com/info`,
 				{},
-				tokenSet
+				tokenPayload
 			)
 			if (blogResponse.ok) {
 				blogProfile = await blogResponse.json()

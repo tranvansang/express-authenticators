@@ -5,10 +5,16 @@
 		"plugin:@typescript-eslint/recommended"
 	],
 	"settings": {
-		"import/extensions": [".js",".ts"],
+		"import/extensions": [
+			".js",
+			".ts"
+		],
 		"import/resolver": {
 			"node": {
-				"extensions": [".js", ".ts"]
+				"extensions": [
+					".js",
+					".ts"
+				]
 			}
 		}
 	},
@@ -28,9 +34,21 @@
 		"comma-dangle": "off",
 		"function-paren-newline": "off",
 		"no-param-reassign": "off",
-		"semi": ["error", "never"],
-		"semi-style": ["error", "first"],
-		"indent": ["error", "tab", {"SwitchCase": 1}],
+		"semi": [
+			"error",
+			"never"
+		],
+		"semi-style": [
+			"error",
+			"first"
+		],
+		"indent": [
+			"error",
+			"tab",
+			{
+				"SwitchCase": 1
+			}
+		],
 		"object-curly-spacing": "off",
 		"padded-blocks": "off",
 		"spaced-comment": "off",
@@ -52,7 +70,10 @@
 				"ignoreRegExpLiterals": true
 			}
 		],
-		"arrow-parens": ["error", "as-needed"],
+		"arrow-parens": [
+			"error",
+			"as-needed"
+		],
 		"no-async-promise-executor": "off",
 		"no-confusing-arrow": "off",
 		"no-nested-ternary": "off",
@@ -96,7 +117,9 @@
 		],
 		"jest/consistent-test-it": [
 			"error",
-			{"fn": "test"}
+			{
+				"fn": "test"
+			}
 		],
 		"jest/prefer-expect-assertions": "off",
 		"jest/expect-expect": "off",
@@ -110,7 +133,9 @@
 	},
 	"overrides": [
 		{
-			"files": ["**/*.js"],
+			"files": [
+				"**/*.js"
+			],
 			"rules": {
 				"no-shadow": "error",
 				"max-len": [
@@ -140,7 +165,10 @@
 			}
 		},
 		{
-			"files": ["scripts/*.{j,t}s{,x}", "codemods/*.{j,t}s{,x}"],
+			"files": [
+				"scripts/*.{j,t}s{,x}",
+				"codemods/*.{j,t}s{,x}"
+			],
 			"rules": {
 				"no-console": "off",
 				"import/no-extraneous-dependencies": "off"

@@ -1,6 +1,6 @@
-import OAuth2, {TokenRequestMethod} from './oauth2/OAuth2'
+import OAuth2, {TokenRequestMethod} from '../oauth2/OAuth2'
 import fetch from 'node-fetch'
-import {IOAuthProfileFetcher, OAuthProfileError} from './OAuthCommon'
+import {IOAuthProfileFetcher, OAuthProfileError} from '../OAuthCommon'
 
 // https://developers.pinterest.com/docs/redoc/martech/#section/User-Authorization/Exchange-the-code-for-an-access-token
 interface IPinterestTokenPayload {

@@ -1,6 +1,6 @@
-import OAuth2, {TokenRequestMethod} from './oauth2/OAuth2'
+import OAuth2, {TokenRequestMethod} from '../oauth2/OAuth2'
 import fetch from 'node-fetch'
-import {IOAuthProfileFetcher, OAuthProfileError} from './OAuthCommon'
+import {IOAuthProfileFetcher, OAuthProfileError} from '../OAuthCommon'
 import * as querystring from 'querystring'
 
 // https://developers.facebook.com/docs/facebook-login/manually-build-a-login-flow#token

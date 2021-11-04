@@ -1,9 +1,15 @@
-// eslint-disable-next-line import/no-unresolved
-import {Request, RequestHandler} from 'express'
+export interface IStoreSession {
+	store(data: string): void | Promise<void>
+}
+
+export interface IPopSession {
+	pop(): string | undefined
+}
 
 export interface IOAuthCommon<T> {
-	authenticate: RequestHandler
-	callback(req: Request): Promise<T> | T
+	authenticate(session: IStoreSession): Promise<string> | string
+
+	callback({pop}: IPopSession, rawQuery: string): Promise<T> | T
 }
 
 export interface IOAuthProfile {
@@ -15,6 +21,7 @@ export interface IOAuthProfile {
 	avatar?: string
 	raw: any
 }
+
 export interface IOAuthProfileFetcher<T> {
 	fetchProfile(tokenSet: T): Promise<IOAuthProfile>
 }

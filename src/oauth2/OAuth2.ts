@@ -1,14 +1,12 @@
 // eslint-disable-next-line import/no-unresolved
-import {Request, Response} from 'express'
 import fetch from 'node-fetch'
-import {IOAuthCommon} from '../OAuthCommon'
+import {IOAuthCommon, IPopSession, IStoreSession} from '../OAuthCommon'
 import OAuth2Error from './OAuth2Error'
 import crypto, {randomUUID} from 'crypto'
 import querystring from 'querystring'
+import {decodeSessionData, encodeSessionData} from '../lib'
 
-const sessionKey = 'oauth2'
-
-export enum TokenRequestMethod {
+export const enum TokenRequestMethod {
 	GET = 'GET',
 	POST = 'POST',
 	PUT = 'PUT'
@@ -31,32 +29,38 @@ export default class OAuth2<T> implements IOAuthCommon<T> {
 			includeStateInAccessToken: boolean
 			enablePKCE: boolean
 		}
-	) {}
+	) {
+	}
 
-	public async callback(req: Request) {
-		const {state: sessionState, verifier} = (req.session as any)[sessionKey] || {}
-		delete (req.session as any)[sessionKey]
-		const {state} = req.query
+	public async callback({pop}: IPopSession, rawQuery: string) {
+		const {
+			state: sessionState,
+			verifier
+		} = decodeSessionData(pop())
+
+		const query = querystring.parse(rawQuery)
+		const {state} = query
 		if (state !== sessionState) throw new OAuth2Error('Invalid returning state')
 		if (
-			req.query.error_code
-			|| req.query.error
-			|| req.query.error_description
-			|| req.query.error_message
-			|| req.query.error_reason
+			query.error_code
+			|| query.error
+			|| query.error_description
+			|| query.error_message
+			|| query.error_reason
 		) {
 			const error = new OAuth2Error(
-				(req.query.error_message
-					|| req.query.error_description
-					|| req.query.error_reason
-					|| req.query.error
+				(query.error_message
+					|| query.error_description
+					|| query.error_reason
+					|| query.error
 					|| 'Unknown OAuth2 error'
 				) as string
 			)
-			error.code = req.query.error_code as string
+			error.code = query.error_code as string
 			throw error
 		}
-		const code = req.query.code
+
+		const code = query.code
 		const body = querystring.stringify({
 			client_id: this.config.clientID,
 			redirect_uri: this.config.redirectUri,
@@ -66,7 +70,8 @@ export default class OAuth2<T> implements IOAuthCommon<T> {
 			...this.options.includeStateInAccessToken && {state},
 			...this.options.enablePKCE && {code_verifier: verifier},
 		})
-		const response = this.options.tokenRequestMethod === TokenRequestMethod.GET
+
+		const res = this.options.tokenRequestMethod === TokenRequestMethod.GET
 			? await fetch(`${this.config.tokenURL}?${body}`)
 			: await fetch(this.config.tokenURL, {
 				method: 'POST',
@@ -76,26 +81,32 @@ export default class OAuth2<T> implements IOAuthCommon<T> {
 				},
 				body
 			})
-		if (!response.ok) throw new OAuth2Error(await response.text() || 'Cannot get access token')
+		if (!res.ok) throw new OAuth2Error(await res.text() || 'Cannot get access token')
+
 		let json
 		try {
-			json = await response.json()
-		} catch (err) {
+			json = await res.json()
+		} catch (err: any) {
 			throw new OAuth2Error(err.message)
 		}
+
 		// const {access_token, token_type, expires_in, refresh_token} = json
 		if (!json.access_token) throw new OAuth2Error('Token not found')
-		return json
+		return <T>json
 	}
 
-	public authenticate(req: Request, res: Response) {
+	public async authenticate({store}: IStoreSession) {
 		const state = randomUUID()
 		// https://datatracker.ietf.org/doc/html/rfc7636#section-4.1
 		// rfc7636 requires key length between 43-128
 		// while v4's generated key has 36 char
 		const verifier = `${randomUUID()}-${randomUUID()}`
-		;(req.session as any)[sessionKey] = {state, verifier}
-		res.status(302).redirect(`${this.config.consentURL}?\
+		await store(encodeSessionData({
+			state,
+			verifier
+		}))
+
+		return `${this.config.consentURL}?\
 ${querystring.stringify({
 		client_id: this.config.clientID,
 		redirect_uri: this.config.redirectUri,
@@ -113,6 +124,6 @@ ${querystring.stringify({
 				.replace(/=/g, ''),
 			code_challenge_method: 'S256'
 		}
-	})}`)
+	})}`
 	}
 }

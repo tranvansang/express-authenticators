@@ -8,7 +8,7 @@ module.exports = api => {
 		plugins: [
 			'@babel/plugin-proposal-object-rest-spread',
 			'@babel/plugin-proposal-class-properties',
-			['@babel/plugin-transform-runtime', { regenerator: true }],
+			['@babel/plugin-transform-runtime', {regenerator: true}],
 		]
 	}
 }
