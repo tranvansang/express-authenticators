@@ -38,7 +38,7 @@ const {
 	PinterestAuthenticator,
 	TumblrAuthenticator,
 	TwitterAuthenticator,
-	LineAuthenticator,
+	ZaloAuthenticator,
 	OAuth2,
 	OAuth
 } = require('express-authenticators')
@@ -107,6 +107,7 @@ Note that NodeJS >= v14.17.0 is required.
     - `LinkedInAuthenticator`
     - `PinterestAuthenticator`
     - `LineAuthenticator`
+    - `ZaloAuthenticator`
 
 ## Constructors
 

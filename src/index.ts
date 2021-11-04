@@ -8,6 +8,7 @@ import PinterestAuthenticator from './vendors/PinterestAuthenticator'
 import TumblrAuthenticator from './vendors/TumblrAuthenticator'
 import TwitterAuthenticator from './vendors/TwitterAuthenticator'
 import LineAuthenticator from './vendors/LineAuthenticator'
+import ZaloAuthenticator from './vendors/ZaloAuthenticator'
 import OAuth from './oauth/OAuth'
 import OAuth2 from './oauth2/OAuth2'
 
@@ -22,6 +23,7 @@ export {
 	TumblrAuthenticator,
 	TwitterAuthenticator,
 	LineAuthenticator,
+	ZaloAuthenticator,
 	OAuth2,
 	OAuth
 }

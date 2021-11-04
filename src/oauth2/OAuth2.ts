@@ -28,8 +28,14 @@ export default class OAuth2<T> implements IOAuthCommon<T> {
 			tokenRequestMethod: TokenRequestMethod
 			includeStateInAccessToken: boolean
 			enablePKCE: boolean
+			clientIDQueryName?: string // default: 'client_id'
+			secretHeaderName?: string // if defined, include clientSecret in header with this name and ignore client_secret in body
 		}
 	) {
+	}
+
+	get #clientIDQueryName(): string {
+		return this.options.clientIDQueryName ?? 'client_id'
 	}
 
 	public async callback({pop}: IPopSession, rawQuery: string) {
@@ -62,9 +68,11 @@ export default class OAuth2<T> implements IOAuthCommon<T> {
 
 		const code = query.code
 		const body = querystring.stringify({
-			client_id: this.config.clientID,
+			[this.#clientIDQueryName]: this.config.clientID,
 			redirect_uri: this.config.redirectUri,
-			client_secret: this.config.clientSecret,
+			...!this.options.secretHeaderName && {
+				client_secret: this.config.clientSecret
+			},
 			code,
 			...!this.options.ignoreGrantType && {grant_type: 'authorization_code'},
 			...this.options.includeStateInAccessToken && {state},
@@ -78,6 +86,9 @@ export default class OAuth2<T> implements IOAuthCommon<T> {
 				headers: {
 					'Content-Type': 'application/x-www-form-urlencoded',
 					Accept: 'application/json',
+					...this.options.secretHeaderName && {
+						[this.options.secretHeaderName]: this.config.clientSecret
+					}
 				},
 				body
 			})
@@ -108,10 +119,10 @@ export default class OAuth2<T> implements IOAuthCommon<T> {
 
 		return `${this.config.consentURL}?\
 ${querystring.stringify({
-		client_id: this.config.clientID,
+		[this.#clientIDQueryName]: this.config.clientID,
 		redirect_uri: this.config.redirectUri,
 		state,
-		scope: this.config.scope,
+		...this.config.scope && {scope: this.config.scope},
 		response_type: 'code',
 		...this.options.enablePKCE && {
 			code_challenge: crypto
