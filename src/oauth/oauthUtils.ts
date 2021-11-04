@@ -1,10 +1,9 @@
-import {v4} from 'uuid'
-import crypto from 'crypto'
+import crypto, {randomUUID} from 'crypto'
 import OAuthError from './OAuthError'
 import r3986 from 'r3986'
 
 export const getTimestamp = () => Math.floor(Date.now() / 1000)
-export const getNonce = () => v4()
+export const getNonce = () => randomUUID()
 
 export enum OAuthSigningMethod {
 	Hmac = 'HMAC-SHA1',
