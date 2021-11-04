@@ -75,7 +75,7 @@ app.get(
 	`/auth/facebook/callback`,
 	async (req, res, next) => {
 		try {
-			const payload = await facebookAuth.callback(req.session.oauthFacebook, new URL(req.url).search)
+			const payload = await facebookAuth.callback(req.session.oauthFacebook, new URL(`https://example.com${req.url}`).search)
 			const profile = await facebookAuth.fetchProfile(payload)
 			console.log('got profile', profile)
 			res.send(JSON.stringify(profile))
