@@ -1,7 +1,7 @@
 import OAuth2, {TokenRequestMethod} from '../oauth2/OAuth2'
 import fetch from 'node-fetch'
 import {IOAuthProfileFetcher, OAuthProfileError} from '../OAuthCommon'
-import * as querystring from 'querystring'
+import {URLSearchParams} from 'url'
 
 // https://developers.zalo.me/docs/api/social-api/tham-khao/user-access-token-v4-post-4316
 interface IZaloTokenPayload {
@@ -20,10 +20,10 @@ const fetchZaloProfile = async (
 		'message'
 	]
 ) => {
-	const res = await fetch(`https://graph.zalo.me/v2.0/me?${querystring.stringify({
+	const res = await fetch(`https://graph.zalo.me/v2.0/me?${new URLSearchParams({
 		access_token,
 		fields: fields.join(',')
-	})}`, {
+	}).toString()}`, {
 		headers: {
 			access_token
 		}
@@ -75,11 +75,11 @@ export default class ZaloAuthenticator
 				Accept: 'application/json',
 				secret_key: this.childConfig.clientSecret
 			},
-			body: querystring.stringify({
+			body: new URLSearchParams({
 				app_id: this.childConfig.clientID,
 				grant_type: 'refresh_token',
 				refresh_token: refreshToken
-			})
+			}).toString()
 		})
 		return await response.json()
 	}

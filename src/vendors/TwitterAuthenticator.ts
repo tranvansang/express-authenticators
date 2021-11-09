@@ -23,7 +23,7 @@ export default class TwitterAuthenticator extends OAuth implements IOAuthProfile
 		const response = await this.signAndFetch(
 			'https://api.twitter.com/1.1/account/verify_credentials.json',
 			{
-				qs: {include_email: true},
+				qs: {include_email: 'true'},
 			},
 			tokenPayload
 		)

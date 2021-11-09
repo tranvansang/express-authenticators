@@ -1,7 +1,7 @@
 import OAuth2, {TokenRequestMethod} from '../oauth2/OAuth2'
 import fetch from 'node-fetch'
 import {IOAuthProfileFetcher, OAuthProfileError} from '../OAuthCommon'
-import * as querystring from 'querystring'
+import {URLSearchParams} from 'url'
 
 // https://developers.facebook.com/docs/facebook-login/manually-build-a-login-flow#token
 interface IFacebookTokenPayload {
@@ -23,10 +23,10 @@ const fetchFacebookProfile = async (
 		'name'
 	]
 ) => {
-	const res = await fetch(`https://graph.facebook.com/v9.0/me?${querystring.stringify({
+	const res = await fetch(`https://graph.facebook.com/v9.0/me?${new URLSearchParams({
 		access_token,
 		fields: fields.join(',')
-	})}`)
+	}).toString()}`)
 	if (!res.ok) throw new OAuthProfileError(await res.text())
 	const profile = await res.json()
 	if (!profile.id) throw new OAuthProfileError('Invalid Facebook profile ID')

@@ -1,7 +1,7 @@
 import OAuth2, {TokenRequestMethod} from '../oauth2/OAuth2'
 import fetch from 'node-fetch'
 import {IOAuthProfileFetcher, OAuthProfileError} from '../OAuthCommon'
-import querystring from 'querystring'
+import {URLSearchParams} from 'url'
 
 // https://developers.google.com/identity/protocols/oauth2/web-server#exchange-authorization-code
 interface IGoogleTokenPayload {
@@ -23,10 +23,10 @@ const fetchGoogleProfile = async (
 		'urls',
 	]
 ) => {
-	const res = await fetch(`https://people.googleapis.com/v1/people/me?${querystring.stringify({
+	const res = await fetch(`https://people.googleapis.com/v1/people/me?${new URLSearchParams({
 		access_token,
 		personFields: fields.join(',')
-	})}`)
+	}).toString()}`)
 	if (!res.ok) throw new OAuthProfileError(await res.text())
 	const profile = await res.json()
 	if (
@@ -126,12 +126,12 @@ export default class GoogleAuthenticator
 				'Content-Type': 'application/x-www-form-urlencoded',
 				Accept: 'application/json',
 			},
-			body: querystring.stringify({
+			body: new URLSearchParams({
 				client_id: this.childConfig.clientID,
 				client_secret: this.childConfig.clientSecret,
 				grant_type: 'refresh_token',
 				refresh_token: refreshToken
-			})
+			}).toString()
 		})
 		return await response.json()
 	}

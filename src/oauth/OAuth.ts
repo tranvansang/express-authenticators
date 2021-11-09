@@ -3,8 +3,8 @@ import {getNonce, getTimestamp, oauthSign, OAuthSigningMethod} from './oauthUtil
 import OAuthError from './OAuthError'
 import r3986 from 'r3986'
 import type {IOAuthCommon, IPopSession, IStoreSession} from '../OAuthCommon'
-import querystring from 'querystring'
 import {decodeSessionData, encodeSessionData} from '../lib'
+import {URLSearchParams} from 'url'
 
 type IHttpMethod = 'POST' | 'GET'
 const version = '1.0'
@@ -13,7 +13,7 @@ interface IOAuthRequestOptions {
 	method?: IHttpMethod
 	headers?: { [key: string]: string }
 	body?: { [key: string]: string }
-	qs?: { [key: string]: string | boolean | number }
+	qs?: { [key: string]: string}
 	oauthHeaders?: { [key: string]: string }
 }
 
@@ -52,10 +52,10 @@ export default class OAuth implements IOAuthCommon<IOAuthTokenPayload> {
 			oauth_token,
 			oauth_token_secret,
 			oauth_callback_confirmed
-		} = querystring.parse(await response.text())
+		} = Object.fromEntries(new URLSearchParams(await response.text()))
 		if (oauth_callback_confirmed !== 'true') throw new Error('Failed to request access token')
 		await store(encodeSessionData({secret: oauth_token_secret}))
-		return `${this.config.authorizeUrl}?${querystring.stringify({oauth_token})}`
+		return `${this.config.authorizeUrl}?${new URLSearchParams({oauth_token}).toString()}`
 	}
 
 	public signAndFetch(
@@ -63,22 +63,21 @@ export default class OAuth implements IOAuthCommon<IOAuthTokenPayload> {
 		options: IOAuthRequestOptions,
 		tokenPayload?: IOAuthTokenPayload
 	) {
-		return fetch(`${url}${options.qs ? `?${querystring.stringify(options.qs)}` : ''}`, {
+		return fetch(`${url}${options.qs ? `?${new URLSearchParams(options.qs).toString()}` : ''}`, {
 			headers: {
 				...options.headers,
 				Authorization: this.#authorizationHeader(url, options, tokenPayload),
 			},
 			method: options.method,
-			body: options.body && querystring.stringify(options.body),
+			body: options.body && new URLSearchParams(options.body).toString(),
 		})
 	}
 
 	public async callback({pop}: IPopSession, rawQuery: string) {
-		const query = querystring.parse(rawQuery)
-		const {
-			oauth_token,
-			oauth_verifier
-		} = query
+		const searchParams = new URLSearchParams(rawQuery)
+		const oauth_token = searchParams.get('oauth_token')
+		const oauth_verifier = searchParams.get('oauth_verifier')
+
 		const sessionSecret = decodeSessionData(pop()).secret
 		if (!sessionSecret) throw new OAuthError('Last token secret lost')
 
@@ -100,7 +99,7 @@ export default class OAuth implements IOAuthCommon<IOAuthTokenPayload> {
 			user_id,
 			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			screen_name
-		} = querystring.parse(await response.text())
+		} = Object.fromEntries(new URLSearchParams(await response.text()))
 
 		return {
 			token: token as string,

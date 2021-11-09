@@ -1,7 +1,7 @@
 import OAuth2, {TokenRequestMethod} from '../oauth2/OAuth2'
 import fetch from 'node-fetch'
 import {IOAuthProfileFetcher, OAuthProfileError} from '../OAuthCommon'
-import * as querystring from 'querystring'
+import {URLSearchParams} from 'url'
 
 // https://developer.foursquare.com/docs/places-api/authentication/#step-3
 interface IFoursquareTokenPayload {
@@ -11,10 +11,10 @@ interface IFoursquareTokenPayload {
 const fetchFoursquareProfile = async (
 	{access_token}: IFoursquareTokenPayload,
 ) => {
-	const res = await fetch(`https://api.foursquare.com/v2/users/self?${querystring.stringify({
+	const res = await fetch(`https://api.foursquare.com/v2/users/self?${new URLSearchParams({
 		oauth_token: access_token,
 		v: '20200408'
-	})}`)
+	}).toString()}`)
 	if (!res.ok) throw new OAuthProfileError(await res.text())
 	const profile = await res.json()
 	if (!profile?.response?.user?.id) throw new OAuthProfileError('Invalid Foursquare profile ID')

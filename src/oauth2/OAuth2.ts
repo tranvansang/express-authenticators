@@ -3,8 +3,8 @@ import fetch from 'node-fetch'
 import {IOAuthCommon, IPopSession, IStoreSession} from '../OAuthCommon'
 import OAuth2Error from './OAuth2Error'
 import crypto, {randomUUID} from 'crypto'
-import querystring from 'querystring'
 import {decodeSessionData, encodeSessionData} from '../lib'
+import {URLSearchParams} from 'url'
 
 export const enum TokenRequestMethod {
 	GET = 'GET',
@@ -44,40 +44,40 @@ export default class OAuth2<T> implements IOAuthCommon<T> {
 			verifier
 		} = decodeSessionData(pop())
 
-		const query = querystring.parse(rawQuery)
-		const {state} = query
+		const query = new URLSearchParams(rawQuery)
+		const state = query.get('state')
 		if (state !== sessionState) throw new OAuth2Error('Invalid returning state')
 		if (
-			query.error_code
-			|| query.error
-			|| query.error_description
-			|| query.error_message
-			|| query.error_reason
+			query.get('error_code')
+			|| query.get('error')
+			|| query.get('error_description')
+			|| query.get('error_message')
+			|| query.get('error_reason')
 		) {
 			const error = new OAuth2Error(
-				(query.error_message
-					|| query.error_description
-					|| query.error_reason
-					|| query.error
+				(query.get('error_message')
+					|| query.get('error_description')
+					|| query.get('error_reason')
+					|| query.get('error')
 					|| 'Unknown OAuth2 error'
 				) as string
 			)
-			error.code = query.error_code as string
+			error.code = query.get('error_code') as string
 			throw error
 		}
 
-		const code = query.code
-		const body = querystring.stringify({
+		const code = query.get('code')
+		const body = new URLSearchParams({
 			[this.#clientIDQueryName]: this.config.clientID,
 			redirect_uri: this.config.redirectUri,
 			...!this.options.secretHeaderName && {
 				client_secret: this.config.clientSecret
 			},
-			code,
+			...code && {code},
 			...!this.options.ignoreGrantType && {grant_type: 'authorization_code'},
-			...this.options.includeStateInAccessToken && {state},
+			...this.options.includeStateInAccessToken && state && {state},
 			...this.options.enablePKCE && {code_verifier: verifier},
-		})
+		}).toString()
 
 		const res = this.options.tokenRequestMethod === TokenRequestMethod.GET
 			? await fetch(`${this.config.tokenURL}?${body}`)
@@ -118,7 +118,7 @@ export default class OAuth2<T> implements IOAuthCommon<T> {
 		}))
 
 		return `${this.config.consentURL}?\
-${querystring.stringify({
+${new URLSearchParams({
 		[this.#clientIDQueryName]: this.config.clientID,
 		redirect_uri: this.config.redirectUri,
 		state,
@@ -135,6 +135,6 @@ ${querystring.stringify({
 				.replace(/=/g, ''),
 			code_challenge_method: 'S256'
 		}
-	})}`
+	}).toString()}`
 	}
 }

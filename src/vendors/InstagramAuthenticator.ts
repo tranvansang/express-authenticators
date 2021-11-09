@@ -1,7 +1,7 @@
 import OAuth2, {TokenRequestMethod} from '../oauth2/OAuth2'
 import fetch from 'node-fetch'
 import {IOAuthProfileFetcher, OAuthProfileError} from '../OAuthCommon'
-import * as querystring from 'querystring'
+import {URLSearchParams} from 'url'
 
 // https://developers.facebook.com/docs/instagram-basic-display-api/reference/oauth-access-token
 interface IInstagramTokenPayload {
@@ -18,10 +18,10 @@ const fetchInstagramProfile = async (
 		'username'
 	]
 ) => {
-	const res = await fetch(`https://graph.instagram.com/me?${querystring.stringify({
+	const res = await fetch(`https://graph.instagram.com/me?${new URLSearchParams({
 		access_token,
 		fields: fields.join(',')
-	})}`, {
+	}).toString()}`, {
 		headers: {
 			Accept: 'application/json',
 		}

@@ -77,7 +77,7 @@ app.get(
 		try {
 			const payload = await facebookAuth.callback(
 				req.session.oauthFacebook,
-				new URL(`https://example.com${req.url}`).search.replace(/^\?/, '')
+				new URL(`https://example.com${req.url}`).search
 			)
 			const profile = await facebookAuth.fetchProfile(payload)
 			console.log('got profile', profile)
@@ -134,7 +134,7 @@ All exported classes inherit the `IOAuthCommon` interface which has the followin
 - `callback({pop}: {pop(): string | undefined}, rawQuery: string)`:
     - Input: `pop` is a function that returns the token from the request session. This token is required to validate the
       authentication.
-    - Input: `query` is the query string from the callback url.
+    - Input: `rawQuery` is the query string from the callback url, the query may or may not contain the leading `?` character (internally, we use `URLSearchParams` which handles this automatically).
     - Output: the token payload returned from the provider. For `OAuth` providers, this
       is `{token: string, secret: string}`. For `OAuth2` providers, the payload is the JSON-parsed response from the
       provider which usually contains the token for further request.
