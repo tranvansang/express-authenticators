@@ -36,7 +36,7 @@
 		"lint:fix": "yarn eslint --fix $(find src -type f ! -name '*.test.ts' | tr '\\n' ' ')"
 	},
 	"dependencies": {
-		"node-fetch": "^2.6.5",
+		"node-fetch": "^3.1.1",
 		"r3986": "^0.0.3"
 	},
 	"devDependencies": {
