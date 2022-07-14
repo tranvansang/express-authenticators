@@ -32,7 +32,7 @@ const fetchGoogleProfile = async (
 	if (
 		!profile.resourceName?.startsWith('people/')
 	) throw new OAuthProfileError('Invalid response from Google People API')
-	const id = profile.resourceName.substr('people/'.length)
+	const id = profile.resourceName.slice('people/'.length)
 	if (!id) throw new OAuthProfileError('Invalid Google profile ID')
 	const getEmail = () => {
 		for (const metaFilter of [
