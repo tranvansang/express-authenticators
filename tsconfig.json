@@ -25,7 +25,8 @@
 			"node",
 			"jest"
 		],
-		"module": "commonjs"
+		"module": "commonjs",
+		"sourceMap": true
 	},
 	"include": [
 		"src/index.ts",
