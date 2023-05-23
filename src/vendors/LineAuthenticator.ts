@@ -8,7 +8,7 @@ interface ILineTokenPayload {
 	access_token: string
 	expires_in: number
 	id_token: string
-	refresh_tokeN: string
+	refresh_token: string
 	scope: string
 	token_type: 'Bearer'
 }
@@ -42,7 +42,7 @@ export default class GoogleAuthenticator
 	async fetchProfile(
 		{
 			access_token,
-			id_token, // to get email
+			id_token, // to get email, if empty or null/undefined, ignore
 		}: ILineTokenPayload,
 		ignoreEmail?: boolean
 	) {
@@ -51,7 +51,7 @@ export default class GoogleAuthenticator
 		// verify key = channel_secret, audience = channel_id, issuer = 'https://access.line.me', algorithms = ['HS256]
 
 		let email
-		if (!ignoreEmail) {
+		if (!ignoreEmail && id_token) {
 			const res = await fetch(
 				'https://api.line.me/oauth2/v2.1/verify',
 				{
