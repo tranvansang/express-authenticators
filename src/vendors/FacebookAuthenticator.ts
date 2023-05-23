@@ -23,7 +23,7 @@ const fetchFacebookProfile = async (
 		'name'
 	]
 ) => {
-	const res = await fetch(`https://graph.facebook.com/v9.0/me?${new URLSearchParams({
+	const res = await fetch(`https://graph.facebook.com/v16.0/me?${new URLSearchParams({
 		access_token,
 		fields: fields.join(',')
 	}).toString()}`)
@@ -36,7 +36,7 @@ const fetchFacebookProfile = async (
 		last: profile.last_name,
 		email: profile.email,
 		emailVerified: !!profile.email,
-		avatar: `https://graph.facebook.com/v9.0/${profile.id}/picture?width=${profilePictureWidth}`,
+		avatar: `https://graph.facebook.com/v16.0/${profile.id}/picture?width=${profilePictureWidth}`,
 		raw: profile
 	}
 }

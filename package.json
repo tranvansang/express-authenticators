@@ -1,10 +1,10 @@
 {
 	"name": "express-authenticators",
-	"version": "0.1.3",
+	"version": "0.1.4",
 	"description": "Third party authenticators in nodejs. Support various providers. Zero heavy dependencies.",
 	"main": "lib/index.js",
 	"repository": "github:tranvansang/express-authenticators",
-	"author": "Tran Sang <info@transang.me>",
+	"author": "Tran Sang <me@transa.ng>",
 	"license": "MIT",
 	"keywords": [
 		"passport",
