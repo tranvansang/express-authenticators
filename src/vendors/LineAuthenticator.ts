@@ -42,7 +42,7 @@ export default class GoogleAuthenticator
 	async fetchProfile(
 		{
 			access_token,
-			id_token
+			id_token, // to get email
 		}: ILineTokenPayload,
 		ignoreEmail?: boolean
 	) {
