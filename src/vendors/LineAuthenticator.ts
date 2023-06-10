@@ -1,5 +1,4 @@
 import OAuth2, {TokenRequestMethod} from '../oauth2/OAuth2'
-import fetch from 'node-fetch'
 import {IOAuthProfileFetcher, OAuthProfileError} from '../OAuthCommon'
 import {URLSearchParams} from 'url'
 

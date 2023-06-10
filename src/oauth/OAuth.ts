@@ -1,4 +1,3 @@
-import fetch from 'node-fetch'
 import {getNonce, getTimestamp, oauthSign, OAuthSigningMethod} from './oauthUtils'
 import OAuthError from './OAuthError'
 import r3986 from 'r3986'

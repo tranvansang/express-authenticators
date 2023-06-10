@@ -1,5 +1,5 @@
 module.exports = {
-	name: 'express-authenticators',
+	displayName: 'express-authenticators',
 	moduleFileExtensions: ['ts', 'js'],
 	verbose: true,
 	collectCoverageFrom: ['<rootDir>/src/**/*.ts'],

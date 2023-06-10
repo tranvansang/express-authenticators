@@ -1,9 +1,8 @@
 // eslint-disable-next-line import/no-unresolved
-import fetch from 'node-fetch'
 import {IOAuthCommon, IPopSession, IStoreSession} from '../OAuthCommon'
 import OAuth2Error from './OAuth2Error'
 import crypto, {randomUUID} from 'crypto'
-import {decodeSessionData, encodeSessionData} from '../lib'
+import {decodeSessionData, encodeSessionData, safeCompare} from '../lib'
 import {URLSearchParams} from 'url'
 
 export const enum TokenRequestMethod {
@@ -50,8 +49,8 @@ export default class OAuth2<T> implements IOAuthCommon<T> {
 		} = decodeSessionData(pop())
 
 		const query = new URLSearchParams(rawQuery)
-		const state = query.get('state')
-		if (state !== sessionState) throw new OAuth2Error('Invalid returning state')
+		const state = String(query.get('state'))
+		if (!safeCompare(state, sessionState)) throw new OAuth2Error('Invalid returning state')
 		if (
 			query.get('error_code')
 			|| query.get('error')

@@ -1,5 +1,4 @@
 import OAuth2, {TokenRequestMethod} from '../oauth2/OAuth2'
-import fetch from 'node-fetch'
 import {IOAuthProfileFetcher, OAuthProfileError} from '../OAuthCommon'
 
 // https://docs.microsoft.com/en-us/linkedin/shared/authentication/authorization-code-flow?context=linkedin%2Fcontext&tabs=HTTPS#step-3-exchange-authorization-code-for-an-access-token

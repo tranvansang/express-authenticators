@@ -6,11 +6,10 @@ Modern OAuth/OAuth2 authenticator.
 
 ## Features
 
-- Pre-configured for popular providers: Apple, Google, Facebook, Foursquare, Github, Twitter, LinkedIn, LINE, Pinterest,
-  Tumblr, Instagram.
+- Pre-configured for popular providers: Apple, Google, Facebook, Foursquare, Github, Twitter, LinkedIn, LINE, Pinterest, Tumblr, Instagram.
 - Pre-configured for popular scopes: email, profile, etc. with account fetching for basic user information.
 - The original OAuth/OAuth2 classes are available for customized providers.
-- The only dependencies are `r3986` and `node-fetch`.
+- The only dependencies are `r3986`.
 - Modern NodeJS. Although, it requires NodeJS >= v14.17.0 to use the `randomUUID()` function.
 - Strongly typed with TypeScript.
 - Support PKCE([Proof Key for Code Exchange](https://oauth.net/2/pkce/)).
@@ -21,7 +20,11 @@ Modern OAuth/OAuth2 authenticator.
 - With `yarn`: `yarn add express-authenticators`.
 - With `npm`: `npm install --save express-authenticators`.
 
-Note: before `v0.1.0`, this package was for ExpressJS only, hence its name is `express-authenticators`.
+## Requirement
+- `fetch` polyfilled.
+- NodeJS >= v14.17.0.
+
+(before `v0.1.0`, this package was for ExpressJS only, hence its name is `express-authenticators`)
 
 ## Sample code in ExpressJS
 
@@ -72,15 +75,15 @@ app.get(
 		}
 	}
 )
-app.get(
+app.get( // for AppleAuthenticator, must use POST method instead
 	`/auth/facebook/callback`,
 	async (req, res, next) => {
 		try {
 			const payload = await facebookAuth.callback(
 				req.session.oauthFacebook,
-				new URL(`https://example.com${req.url}`).search
+				new URL(`https://example.com${req.url}`).search // for AppleAuthenticator, use req.body instead
 			)
-			const profile = await facebookAuth.fetchProfile(payload)
+			const profile = await facebookAuth.fetchProfile(payload) // not supported by AppleAuthenticator
 			console.log('got profile', profile)
 			res.send(JSON.stringify(profile))
 		} catch (e) {
@@ -91,8 +94,6 @@ app.get(
 ```
 
 # API references
-
-Note that NodeJS >= v14.17.0 is required.
 
 ## Exported classes
 
@@ -118,7 +119,7 @@ Note that NodeJS >= v14.17.0 is required.
 ```typescript
 {
 	clientID: string
-	clientSecret: string
+	clientSecret: string // not required for AppleAuthenticator
 	redirectUri: string
 }
 ```
@@ -145,7 +146,7 @@ All exported classes inherit the `IOAuthCommon` interface which has the followin
 
 Pre-configured providers have the following methods:
 
-- `fetchProfile(tokenPayload): Promise<IOAuthProfile>`: takes the token payload returned from the `callback()` method
+- `fetchProfile(tokenPayload): Promise<IOAuthProfile>` (not available with AppleAuthenticator): takes the token payload returned from the `callback()` method
   and returns the profile data. Although each provider returns different data, they are all pre-configured in this
   library to return the `IOAuthProfile` described below.
 

@@ -1,35 +1,20 @@
 {
 	"compilerOptions": {
-		// Target latest version of ECMAScript.
 		"target": "ES6",
-		// Search under node_modules for non-relative imports.
 		"moduleResolution": "node",
-		// Process & infer types from .js files.
-		//    "allowJs": true,
 		"declaration": true,
 		"outDir": "lib",
-		/* Redirect output structure to the directory. */
 		"rootDir": "src",
-		/* Specify the root directory of input files. Use to control the output directory structure with --outDir. */
-		// Enable strictest settings like strictNullChecks & noImplicitAny.
 		"strict": true,
-		// Disallow features that require cross-file information for emit.
 		"isolatedModules": false,
-		// Import non-ES modules as default imports.
 		"esModuleInterop": true,
 		"allowSyntheticDefaultImports": true,
-		"lib": [
-			"esnext"
-		],
+		"lib": ["esnext", "dom"],
 		"types": [
 			"node",
 			"jest"
 		],
 		"module": "commonjs",
 		"sourceMap": true
-	},
-	"include": [
-		"src/index.ts",
-		"src/node-fetch.d.ts"
-	]
+	}
 }
