@@ -22,7 +22,8 @@
 		"instagram",
 		"tumblr",
 		"oauth",
-		"oauth2"
+		"oauth2",
+		"apple"
 	],
 	"files": [
 		"lib"

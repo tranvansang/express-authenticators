@@ -30,6 +30,11 @@ export default class OAuth2<T> implements IOAuthCommon<T> {
 			enablePKCE: boolean
 			clientIDQueryName?: string // default: 'client_id'
 			secretHeaderName?: string // if defined, include clientSecret in header with this name and ignore client_secret in body
+
+			// for apple
+			responseType?: string // default: 'code'
+			consentAdditionalParams?: Record<string, string>
+			addNonceToAuthorizeURL?: boolean
 		}
 	) {
 	}
@@ -123,7 +128,7 @@ ${new URLSearchParams({
 		redirect_uri: this.config.redirectUri,
 		state,
 		...this.config.scope && {scope: this.config.scope},
-		response_type: 'code',
+		response_type: this.options.responseType ?? 'code',
 		...this.options.enablePKCE && {
 			code_challenge: crypto
 				.createHash('sha256')
@@ -134,7 +139,11 @@ ${new URLSearchParams({
 				.replace(/\//g, '_')
 				.replace(/=/g, ''),
 			code_challenge_method: 'S256'
-		}
+		},
+		...this.options.addNonceToAuthorizeURL && {
+			nonce: randomUUID(),
+		},
+		...this.options.consentAdditionalParams,
 	}).toString()}`
 	}
 }

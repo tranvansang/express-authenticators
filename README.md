@@ -6,7 +6,7 @@ Modern OAuth/OAuth2 authenticator.
 
 ## Features
 
-- Pre-configured for popular providers: Google, Facebook, Foursquare, Github, Twitter, LinkedIn, LINE, Pinterest,
+- Pre-configured for popular providers: Apple, Google, Facebook, Foursquare, Github, Twitter, LinkedIn, LINE, Pinterest,
   Tumblr, Instagram.
 - Pre-configured for popular scopes: email, profile, etc. with account fetching for basic user information.
 - The original OAuth/OAuth2 classes are available for customized providers.
@@ -28,6 +28,7 @@ Note: before `v0.1.0`, this package was for ExpressJS only, hence its name is `e
 ```javascript
 
 const {
+	AppleAuthenticator,
 	FacebookAuthenticator,
 	FoursquareAuthenticator,
 	GithubAuthenticator,
@@ -99,6 +100,7 @@ Note that NodeJS >= v14.17.0 is required.
 
 - Pre-configured providers that inherit `OAuth`: `TwitterAuthenticator`, `TumblrAuthenticator`.
 - Pre-configured providers that inherit `OAuth2`:
+    - `AppleAuthenticator`
     - `FacebookAuthenticator`
     - `FoursquareAuthenticator`
     - `GithubAuthenticator`
