@@ -7,7 +7,7 @@ interface IAppleTokenPayload {
 	access_token: string
 	expires_in: number
 	refresh_token: string
-	scope: string
+	id_token: string
 	token_type: 'Bearer'
 }
 
@@ -100,13 +100,18 @@ export default class AppleAuthenticator
 		clientID: string
 		clientSecret: string
 		redirectUri: string
-		scope?: string
+		scope?: string // 'email name'
 	}) {
 		super({
 			consentURL: 'https://appleid.apple.com/auth/authorize',
-			tokenURL: 'https://oauth2.googleapis.com/token',
-			scope: ['email', 'name'].join(' '),
+			// https://developer.apple.com/documentation/sign_in_with_apple/generate_and_validate_tokens
+			tokenURL: 'https://appleid.apple.com/auth/token',
+			// scope: ['email', 'name'].join(' '), // must be null, otherwise, response_mode must be form_post and break the oauth2 flow
 			...childConfig,
+			get clientSecret() {
+				// https://developer.apple.com/documentation/sign_in_with_apple/generate_and_validate_tokens#3262048
+				return ''
+			},
 		}, {
 			responseType: 'code id_token', // 'code' or 'code id_token'
 			ignoreGrantType: false,
@@ -115,7 +120,7 @@ export default class AppleAuthenticator
 			enablePKCE: false,
 			addNonceToAuthorizeURL: true,
 			// https://developer.apple.com/documentation/sign_in_with_apple/sign_in_with_apple_js/incorporating_sign_in_with_apple_into_other_platforms#3332113
-			consentAdditionalParams: {response_mode: 'form_post'} // form_post or fragment
+			consentAdditionalParams: {response_mode: 'query'} // query or form_post or fragment
 		})
 	}
 
