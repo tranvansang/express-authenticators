@@ -32,13 +32,9 @@ export default class AppleAuthenticator extends OAuth2<IAppleTokenPayload> {
 			// https://developer.apple.com/documentation/sign_in_with_apple/generate_and_validate_tokens
 			tokenURL: 'https://appleid.apple.com/auth/token',
 			scope: ['email', 'name'].join(' '), // must be null, otherwise, response_mode must be form_post and break the oauth2 flow
+			// https://developer.apple.com/documentation/sign_in_with_apple/generate_and_validate_tokens#3262048
+			clientSecret: '',
 			...childConfig,
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-ignore
-			get clientSecret() {
-				// https://developer.apple.com/documentation/sign_in_with_apple/generate_and_validate_tokens#3262048
-				throw new Error('AppleAuthenticator.clientSecret is not available')
-			},
 		}, {
 			responseType: 'code id_token', // 'code' or 'code id_token'
 			ignoreGrantType: false,
@@ -61,10 +57,10 @@ export default class AppleAuthenticator extends OAuth2<IAppleTokenPayload> {
 		user: string
 		error: string
 	}) {
-		const {state: sessionState} = decodeSessionData(pop())
+		const {state: sessionState, nonce} = decodeSessionData(pop())
 
 		if (!safeCompare(state, sessionState)) throw new OAuth2Error('Invalid returning state')
 		if (error) throw new OAuth2Error(error)
-		return {code, id_token, state, user}
+		return {code, id_token, state, user, nonce}
 	}
 }

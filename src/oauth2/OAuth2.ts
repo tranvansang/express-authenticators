@@ -116,9 +116,11 @@ export default class OAuth2<T> implements IOAuthCommon<T> {
 		// rfc7636 requires key length between 43-128
 		// while v4's generated key has 36 char
 		const verifier = `${randomUUID()}-${randomUUID()}`
+		const nonce = randomUUID()
 		await store(encodeSessionData({
 			state,
-			verifier
+			verifier,
+			...this.options.addNonceToAuthorizeURL && {nonce}
 		}))
 
 		return `${this.config.consentURL}?\
@@ -139,9 +141,7 @@ ${new URLSearchParams({
 				.replace(/=/g, ''),
 			code_challenge_method: 'S256'
 		},
-		...this.options.addNonceToAuthorizeURL && {
-			nonce: randomUUID(),
-		},
+		...this.options.addNonceToAuthorizeURL && {nonce},
 		...this.options.consentAdditionalParams,
 	}).toString()}`
 	}
