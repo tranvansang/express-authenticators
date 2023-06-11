@@ -26,6 +26,7 @@ export default class AppleAuthenticator extends OAuth2<IAppleTokenPayload> {
 		clientID: string
 		redirectUri: string
 		scope?: string
+		ignoreStateCheck?: boolean
 	}) {
 		super({
 			consentURL: 'https://appleid.apple.com/auth/authorize',
@@ -59,7 +60,7 @@ export default class AppleAuthenticator extends OAuth2<IAppleTokenPayload> {
 	}) {
 		const {state: sessionState, nonce} = decodeSessionData(pop())
 
-		if (!safeCompare(state, sessionState)) throw new OAuth2Error('Invalid returning state')
+		if (!this.childConfig.ignoreStateCheck && !safeCompare(state, sessionState)) throw new OAuth2Error('Invalid returning state')
 		if (error) throw new OAuth2Error(error)
 		return {code, id_token, state, user, nonce}
 	}
