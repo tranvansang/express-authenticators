@@ -1,6 +1,6 @@
 import {getGoogleConsentUrl, getGoogleAccessToken, fetchGoogleProfile, refreshGoogleAccessToken, verifyGoogleIdToken} from './vendors/google'
 import {getFacebookConsentUrl, getFacebookAccessToken, fetchFacebookProfile} from './vendors/facebook'
-import {getAppleConsentUrl} from './vendors/apple'
+import {getAppleConsentUrl, getAppleToken, generateAppleClientSecret, verifyAppleIdToken, revokeAppleToken} from './vendors/apple'
 import {getGithubConsentUrl, getGithubAccessToken, fetchGithubProfile} from './vendors/github'
 import {getFoursquareConsentUrl, getFoursquareAccessToken, fetchFoursquareProfile} from './vendors/foursquare'
 import {getInstagramConsentUrl, getInstagramAccessToken, fetchInstagramProfile} from './vendors/instagram'
@@ -16,7 +16,7 @@ import {getOauth1ConsentUrl, getOAuth1AccessToken, oauth1SignAndFetch} from './l
 export {
 	getGoogleConsentUrl, getGoogleAccessToken, fetchGoogleProfile, refreshGoogleAccessToken, verifyGoogleIdToken,
 	getFacebookConsentUrl, getFacebookAccessToken, fetchFacebookProfile,
-	getAppleConsentUrl,
+	getAppleConsentUrl, getAppleToken, generateAppleClientSecret, verifyAppleIdToken, revokeAppleToken,
 	getGithubConsentUrl, getGithubAccessToken, fetchGithubProfile,
 	getFoursquareConsentUrl, getFoursquareAccessToken, fetchFoursquareProfile,
 	getInstagramConsentUrl, getInstagramAccessToken, fetchInstagramProfile,
