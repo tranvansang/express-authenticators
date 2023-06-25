@@ -1,6 +1,6 @@
 import {getAccessToken, getConsentUrl, OAuthCallbackQuery, OAuthError, OAuthState} from '../lib/oauth'
 import {URLSearchParams} from 'url'
-import {OAuthProfile} from '../lib/util'
+import {jsonFetch, OAuthProfile} from '../lib/util'
 
 const enablePKCE = false
 const defaultVersion = 'v16.0'
@@ -78,12 +78,10 @@ export const fetchFacebookProfile = async (
 		version?: string
 	} = {},
 ): Promise<OAuthProfile> => {
-	const res = await fetch(`https://graph.facebook.com/${version}/me?${new URLSearchParams({
+	const profile = await jsonFetch(`https://graph.facebook.com/${version}/me?${new URLSearchParams({
 		access_token,
 		fields: fields.join(',')
 	}).toString()}`)
-	if (!res.ok) throw new OAuthError(await res.text())
-	const profile = await res.json()
 	if (!profile.id) throw new OAuthError('Invalid Facebook profile ID')
 	return {
 		id: profile.id,

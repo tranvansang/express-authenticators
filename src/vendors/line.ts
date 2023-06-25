@@ -1,5 +1,5 @@
-import {getAccessToken, getConsentUrl, OAuthCallbackQuery, OAuthError, OAuthState} from '../lib/oauth'
-import {OAuthProfile} from '../lib/util'
+import {getAccessToken, getConsentUrl, OAuthCallbackQuery, OAuthState} from '../lib/oauth'
+import {jsonFetch, OAuthProfile} from '../lib/util'
 import {URLSearchParams} from 'url'
 
 export const getLineConsentUrl = (
@@ -63,23 +63,19 @@ export const refreshLineAccessToken = async (
 		clientSecret: string
 	},
 	refreshToken: string
-) => {
-	const res = await fetch('https://api.line.me/oauth2/v2.1/token', {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/x-www-form-urlencoded',
-			Accept: 'application/json',
-		},
-		body: new URLSearchParams({
-			client_id: clientID,
-			client_secret: clientSecret,
-			grant_type: 'refresh_token',
-			refresh_token: refreshToken
-		}).toString()
-	})
-	if (!res.ok) throw new OAuthError(await res.text())
-	return await res.json()
-}
+) => await jsonFetch('https://api.line.me/oauth2/v2.1/token', {
+	method: 'POST',
+	headers: {
+		'Content-Type': 'application/x-www-form-urlencoded',
+		Accept: 'application/json',
+	},
+	body: new URLSearchParams({
+		client_id: clientID,
+		client_secret: clientSecret,
+		grant_type: 'refresh_token',
+		refresh_token: refreshToken
+	}).toString()
+})
 
 // https://developers.line.biz/en/reference/line-login/#oauth
 export const fetchLineProfile = async (
@@ -100,25 +96,25 @@ export const fetchLineProfile = async (
 
 	let email
 	if (!ignoreEmail && id_token) {
-		const res = await fetch(
-			'https://api.line.me/oauth2/v2.1/verify',
-			{
-				method: 'POST',
-				body: new URLSearchParams({
-					id_token,
-					client_id: clientID
-				}).toString(),
-				headers: {
-					'Content-Type': 'application/x-www-form-urlencoded',
-					Accept: 'application/json',
-				},
-			}
-		)
-		if (!res.ok) throw new OAuthError(await res.text())
-		email = (await res.json()).email // 'name', 'picture' might be included if appropriate scopes included.
+		try {
+			email = (await jsonFetch(
+				'https://api.line.me/oauth2/v2.1/verify',
+				{
+					method: 'POST',
+					body: new URLSearchParams({
+						id_token,
+						client_id: clientID
+					}).toString(),
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded',
+						Accept: 'application/json',
+					},
+				}
+			)).email // 'name', 'picture' might be included if appropriate scopes included.
+		} catch { /* empty */ }
 	}
 
-	const res = await fetch(
+	const profile = await jsonFetch(
 		'https://api.line.me/v2/profile',
 		{
 			headers: {
@@ -126,9 +122,7 @@ export const fetchLineProfile = async (
 			}
 		}
 	)
-	if (!res.ok) throw new OAuthError(await res.text())
 
-	const profile = await res.json()
 	const {
 		userId,
 		displayName,

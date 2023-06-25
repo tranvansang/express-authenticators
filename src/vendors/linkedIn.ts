@@ -1,5 +1,5 @@
 import {getAccessToken, getConsentUrl, OAuthCallbackQuery, OAuthError, OAuthState} from '../lib/oauth'
-import {OAuthProfile} from '../lib/util'
+import {jsonFetch, OAuthProfile} from '../lib/util'
 
 const enablePKCE = false
 export const getLinkedInConsentUrl = (
@@ -54,7 +54,7 @@ export const getLinkedInAccessToken = async (
 export const fetchLinkedInProfile = async (
 	access_token: string
 ): Promise<OAuthProfile> => {
-	const res = await fetch(`https://api.linkedin.com/v2/me?projection=(${
+	const profile = await jsonFetch(`https://api.linkedin.com/v2/me?projection=(${
 		[
 			'id',
 			'profilePicture(displayImage~:playableStreams)',
@@ -69,8 +69,6 @@ export const fetchLinkedInProfile = async (
 			Accept: 'application/json',
 		}
 	})
-	if (!res.ok) throw new OAuthError(await res.text())
-	const profile = await res.json()
 	if (!profile.id) throw new OAuthError('Invalid LinkedIn profile ID')
 	return {
 		id: profile.id,

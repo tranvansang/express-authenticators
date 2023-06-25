@@ -1,6 +1,6 @@
 import {getAccessToken, getConsentUrl, OAuthCallbackQuery, OAuthError, OAuthState} from '../lib/oauth'
 import {URLSearchParams} from 'url'
-import {OAuthProfile} from '../lib/util'
+import {jsonFetch, OAuthProfile} from '../lib/util'
 
 const enablePKCE = false
 
@@ -54,12 +54,10 @@ export const fetchFoursquareProfile = async (
 		version?: string
 	} = {}
 ): Promise<OAuthProfile> => {
-	const res = await fetch(`https://api.foursquare.com/v2/users/self?${new URLSearchParams({
+	const profile = await jsonFetch(`https://api.foursquare.com/v2/users/self?${new URLSearchParams({
 		oauth_token: access_token,
 		v: version
 	}).toString()}`)
-	if (!res.ok) throw new OAuthError(await res.text())
-	const profile = await res.json()
 	if (!profile?.response?.user?.id) throw new OAuthError('Invalid Foursquare profile ID')
 	return {
 		id: profile.response.user.id,

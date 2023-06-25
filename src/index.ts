@@ -1,4 +1,4 @@
-import {getGoogleConsentUrl, getGoogleAccessToken, fetchGoogleProfile, refreshGoogleAccessToken} from './vendors/google'
+import {getGoogleConsentUrl, getGoogleAccessToken, fetchGoogleProfile, refreshGoogleAccessToken, verifyGoogleIdToken} from './vendors/google'
 import {getFacebookConsentUrl, getFacebookAccessToken, fetchFacebookProfile} from './vendors/facebook'
 import {getAppleConsentUrl} from './vendors/apple'
 import {getGithubConsentUrl, getGithubAccessToken, fetchGithubProfile} from './vendors/github'
@@ -14,7 +14,7 @@ import {getConsentUrl, getAccessToken} from './lib/oauth'
 import {getOauth1ConsentUrl, getOAuth1AccessToken, oauth1SignAndFetch} from './lib/oauth1'
 
 export {
-	getGoogleConsentUrl, getGoogleAccessToken, fetchGoogleProfile, refreshGoogleAccessToken,
+	getGoogleConsentUrl, getGoogleAccessToken, fetchGoogleProfile, refreshGoogleAccessToken, verifyGoogleIdToken,
 	getFacebookConsentUrl, getFacebookAccessToken, fetchFacebookProfile,
 	getAppleConsentUrl,
 	getGithubConsentUrl, getGithubAccessToken, fetchGithubProfile,

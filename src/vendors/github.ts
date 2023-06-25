@@ -1,5 +1,5 @@
 import {getAccessToken, getConsentUrl, OAuthCallbackQuery, OAuthError, OAuthState} from '../lib/oauth'
-import {OAuthProfile} from '../lib/util'
+import {jsonFetch, OAuthProfile} from '../lib/util'
 
 const enablePKCE = false
 
@@ -55,21 +55,21 @@ export const getGithubAccessToken = async (
 export const fetchGithubProfile = async (
 	access_token: string,
 ): Promise<OAuthProfile> => {
-	const res = await fetch('https://api.github.com/user', {
-		headers: {
-			Authorization: `token ${access_token}`,
-			Accept: 'application/json',
-		}
-	})
-	if (!res.ok) throw new OAuthError(await res.text())
-	const emailRes = await fetch('https://api.github.com/user/emails', {
+	const profile = await jsonFetch('https://api.github.com/user', {
 		headers: {
 			Authorization: `token ${access_token}`,
 			Accept: 'application/json',
 		}
 	})
 	let emails: any[]
-	if (emailRes.ok) emails = await emailRes.json()
+	try {
+		emails = await jsonFetch('https://api.github.com/user/emails', {
+			headers: {
+				Authorization: `token ${access_token}`,
+				Accept: 'application/json',
+			}
+		})
+	} catch { /* empty */ }
 	const getEmail = () => {
 		for (const emailFilter of [
 			(meta: any) => meta?.primary && meta?.verified,
@@ -86,7 +86,6 @@ export const fetchGithubProfile = async (
 			emailVerified: emailData.verified
 		}
 	}
-	const profile = await res.json()
 	if (!profile.id) throw new OAuthError('Invalid Github profile ID')
 	return {
 		id: profile.id,

@@ -1,5 +1,5 @@
 import {getAccessToken, getConsentUrl, OAuthCallbackQuery, OAuthError, OAuthState} from '../lib/oauth'
-import {OAuthProfile} from '../lib/util'
+import {jsonFetch, OAuthProfile} from '../lib/util'
 import {URLSearchParams} from 'url'
 
 export const getZaloConsentUrl = (
@@ -65,7 +65,7 @@ export const fetchZaloProfile = async (
 		]
 	} = {}
 ): Promise<OAuthProfile> => {
-	const res = await fetch(`https://graph.zalo.me/v2.0/me?${new URLSearchParams({
+	const profile = await jsonFetch(`https://graph.zalo.me/v2.0/me?${new URLSearchParams({
 		access_token,
 		fields: fields.join(',')
 	}).toString()}`, {
@@ -73,9 +73,6 @@ export const fetchZaloProfile = async (
 			access_token
 		}
 	})
-	if (!res.ok) throw new OAuthError(await res.text())
-
-	const profile = await res.json()
 	if (!profile.id) throw new OAuthError('Invalid Zalo profile ID')
 	if (profile.error) throw new OAuthError(`Zalo error: ${profile.message}`)
 
@@ -97,20 +94,16 @@ export const refreshZaloAccessToken = async (
 	access_token: string // expires in 1 hour
 	refresh_token: string // 3 months
 	expires_in: string // in second
-}> => {
-	const res = await fetch('https://oauth.zaloapp.com/v4/access_token', {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/x-www-form-urlencoded',
-			Accept: 'application/json',
-			secret_key: clientSecret
-		},
-		body: new URLSearchParams({
-			app_id: clientID,
-			grant_type: 'refresh_token',
-			refresh_token: refreshToken
-		}).toString()
-	})
-	if (!res.ok) throw new OAuthError(await res.text())
-	return await res.json()
-}
+}> => await jsonFetch('https://oauth.zaloapp.com/v4/access_token', {
+	method: 'POST',
+	headers: {
+		'Content-Type': 'application/x-www-form-urlencoded',
+		Accept: 'application/json',
+		secret_key: clientSecret
+	},
+	body: new URLSearchParams({
+		app_id: clientID,
+		grant_type: 'refresh_token',
+		refresh_token: refreshToken
+	}).toString()
+})

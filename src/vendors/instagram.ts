@@ -1,6 +1,6 @@
 import {getAccessToken, getConsentUrl, OAuthCallbackQuery, OAuthError, OAuthState} from '../lib/oauth'
 import {URLSearchParams} from 'url'
-import {OAuthProfile} from '../lib/util'
+import {jsonFetch, OAuthProfile} from '../lib/util'
 
 const enablePKCE = false
 
@@ -63,7 +63,7 @@ export const fetchInstagramProfile = async (
 		]
 	} = {}
 ): Promise<OAuthProfile> => {
-	const res = await fetch(`https://graph.instagram.com/me?${new URLSearchParams({
+	const profile = await jsonFetch(`https://graph.instagram.com/me?${new URLSearchParams({
 		access_token,
 		fields: fields.join(',')
 	}).toString()}`, {
@@ -71,15 +71,12 @@ export const fetchInstagramProfile = async (
 			Accept: 'application/json',
 		}
 	})
-	if (!res.ok) throw new OAuthError(await res.text())
-	const profile = await res.json()
 	if (!profile.id) throw new OAuthError('Invalid Instagram profile ID')
 	let graphProfile
 	if (profile.username) {
-		const graphRes = await fetch(`https://instagram.com/${profile.username}/?__a=1`)
-		if (graphRes.ok) {
-			graphProfile = await graphRes.json()
-		}
+		try {
+			graphProfile = await jsonFetch(`https://instagram.com/${profile.username}/?__a=1`)
+		} catch { /* empty */ }
 	}
 	return {
 		id: profile.id,

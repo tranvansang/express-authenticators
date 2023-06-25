@@ -1,5 +1,5 @@
 import {getAccessToken, getConsentUrl, OAuthCallbackQuery, OAuthError, OAuthState} from '../lib/oauth'
-import {OAuthProfile} from '../lib/util'
+import {jsonFetch, OAuthProfile} from '../lib/util'
 
 const enablePKCE = false
 
@@ -60,7 +60,7 @@ export const getPinterestAccessToken = async (
 export const fetchPinterestProfile = async (
 	access_token: string,
 ): Promise<OAuthProfile> => {
-	const res = await fetch(
+	const {data: profile} = await jsonFetch(
 		'https://api.pinterest.com/v3/users/me',
 		{
 			headers: {
@@ -68,8 +68,6 @@ export const fetchPinterestProfile = async (
 			}
 		}
 	)
-	if (!res.ok) throw new OAuthError(await res.text())
-	const {data: profile} = await res.json()
 	// Pinterest does not include response shape in document
 	// https://developers.pinterest.com/docs/redoc/martech/#operation/v3_get_user_handler_GET
 	if (!profile.id) throw new OAuthError('Invalid Pinterest profile')

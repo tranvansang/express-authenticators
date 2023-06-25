@@ -30,7 +30,8 @@ export class OAuth1Error extends Error {
 	name = 'OAuth1Error'
 }
 
-const oauthSign = (method: OAuth1SigningMethod, base: string, consumerSecret: string, tokenSecret?: string) => {
+// export for test
+export const oauth1Sign = (method: OAuth1SigningMethod, base: string, consumerSecret: string, tokenSecret?: string) => {
 	switch (method) {
 		case 'HMAC-SHA1':
 			consumerSecret = r3986(consumerSecret)
@@ -92,7 +93,7 @@ const authorizationHeader = (
 		.map(([k, v]) => `${k}=${v}`)
 		.join('&')
 	const baseString = `${method}&${r3986(url)}&${r3986(allPairs)}`
-	const signature = oauthSign(signingMethod, baseString, clientSecret, tokenSet?.secret)
+	const signature = oauth1Sign(signingMethod, baseString, clientSecret, tokenSet?.secret)
 	const signedAuthHeaders: { [key: string]: string } = {
 		...authHeaders,
 		oauth_signature: signature,
