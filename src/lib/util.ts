@@ -120,7 +120,7 @@ export const jsonFetch = async (url: string, options?: any) => {
 		let text
 		try {
 			text = await response.text()
-		} catch (e) {
+		} catch (e: any) {
 			text = e.message
 		}
 		throw new Error(`${response.status}: ${response.statusText} ${text}`)
