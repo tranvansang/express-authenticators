@@ -5,10 +5,10 @@ const enablePKCE = false
 export const getLinkedInConsentUrl = (
 	{
 		scope = [
-				'r_emailaddress',
-				'r_liteprofile',
-				// 'w_member_social'
-			].join(' '),
+			'r_emailaddress',
+			'r_liteprofile',
+			// 'w_member_social'
+		].join(' '),
 		clientID,
 		redirectUri,
 	}: {

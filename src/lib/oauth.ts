@@ -117,7 +117,7 @@ export const getAccessToken = async <T>(
 	{
 		state: sessionState,
 		verifier,
-		nonce,
+		// nonce,
 	}: OAuthState,
 	{
 		state: returnState,

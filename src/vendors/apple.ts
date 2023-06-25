@@ -54,11 +54,14 @@ export const verifyAppleIdToken = async (
 		iat, // issued at
 		sub, // subject
 		nonce: decodedNonce,
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		c_hash,
 		email,
 		email_verified,
 		is_private_email,
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		auth_time,
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		nonce_supported,
 		firstName,
 		lastName,
@@ -119,8 +122,8 @@ export const verifyAppleIdToken = async (
 		&& safeCompare(use, 'sig') //  'sig' or 'enc': https://datatracker.ietf.org/doc/html/draft-ietf-jose-json-web-key-41#section-4.2
 	) {
 		const pem = rsaPublicKeyPem(n, e)
-		const [header, payload, signature] = idToken.split('.') as [string, string, string]
-		if (createVerify('RSA-SHA256').update([header, payload].join('.')).verify(
+		const [header, idTokenPayload, signature] = idToken.split('.') as [string, string, string]
+		if (createVerify('RSA-SHA256').update([header, idTokenPayload].join('.')).verify(
 			pem,
 			uriToBase64(signature),
 			'base64'

@@ -176,6 +176,7 @@ export const verifyGoogleIdToken = async (
 			sub, // subject
 			email,
 			email_verified,
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			azp, // authorized party
 			name,
 			picture,
