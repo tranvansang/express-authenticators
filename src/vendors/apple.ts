@@ -169,7 +169,7 @@ export const revokeAppleToken = async (
 	}
 ) => {
 	// response is empty if success
-	const res = await jsonFetch('https://appleid.apple.com/auth/revoke', {
+	const res = await fetch('https://appleid.apple.com/auth/revoke', {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/x-www-form-urlencoded',
