@@ -16,15 +16,18 @@ export const getAppleConsentUrl = (
 		scope = ['email', 'name'].join(' '), // if non-null, response_mode must be form_post and break the oauth2 flow
 		clientID,
 		redirectUri,
+		state,
 	}: {
 		clientID: string
 		redirectUri: string
 		scope?: string
+		state?: string
 	}
 ) => getConsentUrl({
 	clientID,
 	redirectUri,
 	scope,
+	state,
 	consentUrl: 'https://appleid.apple.com/auth/authorize',
 	enablePKCE: false,
 	addNonce: true,
