@@ -167,18 +167,30 @@ export const revokeAppleToken = async (
 		token: string
 		tokenType: 'access_token' | 'refresh_token'
 	}
-) => await jsonFetch('https://appleid.apple.com/auth/revoke', {
-	method: 'POST',
-	headers: {
-		'Content-Type': 'application/x-www-form-urlencoded',
-	},
-	body: new URLSearchParams({
-		client_id: appleEnv.clientId,
-		client_secret: generateAppleClientSecret(appleEnv),
-		token,
-		token_type_hint: tokenType,
-	}).toString(),
-})
+) => {
+	// response is empty if success
+	const res = await jsonFetch('https://appleid.apple.com/auth/revoke', {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/x-www-form-urlencoded',
+		},
+		body: new URLSearchParams({
+			client_id: appleEnv.clientId,
+			client_secret: generateAppleClientSecret(appleEnv),
+			token,
+			token_type_hint: tokenType,
+		}).toString(),
+	})
+	if (!res.ok) {
+		let text
+		try {
+			text = await res.text()
+		} catch (e: any) {
+			text = e.message
+		}
+		throw new Error(`${res.status}: ${res.statusText} ${text}`)
+	}
+}
 
 // https://developer.apple.com/documentation/sign_in_with_apple/generate_and_validate_tokens
 // https://developer.apple.com/documentation/sign_in_with_apple/tokenresponse

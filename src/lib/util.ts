@@ -115,15 +115,15 @@ export const uriToBase64 = (str: string) => padString(str)
 	.replace(/-/g, '+')
 
 export const jsonFetch = async (url: string, options?: any) => {
-	const response = await globalThis.fetch(url, options)
-	if (!response.ok) {
+	const res = await globalThis.fetch(url, options)
+	if (!res.ok) {
 		let text
 		try {
-			text = await response.text()
+			text = await res.text()
 		} catch (e: any) {
 			text = e.message
 		}
-		throw new Error(`${response.status}: ${response.statusText} ${text}`)
+		throw new Error(`${res.status}: ${res.statusText} ${text}`)
 	}
-	return await response.json()
+	return await res.json()
 }
