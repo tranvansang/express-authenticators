@@ -224,9 +224,9 @@ export default class TwitterAuthenticator extends OAuth implements IOAuthProfile
 			},
 			tokenPayload
 		)
-		if (!response.ok) throw new OAuthProfileError(await response.text())
+		if (!response.ok) throw new OAuthError(await response.text())
 		const profile = await response.json()
-		if (!profile.id_str) throw new OAuthProfileError('Invalid Twitter profile ID')
+		if (!profile.id_str) throw new OAuthError('Invalid Twitter profile ID')
 		return {
 			id: profile.id_str,
 			raw: profile,

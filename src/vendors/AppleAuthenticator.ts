@@ -1,7 +1,8 @@
 import OAuth2, {TokenRequestMethod} from '../oauth2/OAuth2'
 import {IPopSession} from '../OAuthCommon'
-import {decodeSessionData, safeCompare} from '../lib'
+import {decodeSessionData} from '../lib'
 import OAuth2Error from '../oauth2/OAuth2Error'
+import {safeCompare} from '../lib/util'
 
 interface IAppleTokenPayload {
 	code: string
@@ -29,22 +30,15 @@ export default class AppleAuthenticator extends OAuth2<IAppleTokenPayload> {
 		ignoreStateCheck?: boolean
 	}) {
 		super({
-			consentURL: 'https://appleid.apple.com/auth/authorize',
 			// https://developer.apple.com/documentation/sign_in_with_apple/generate_and_validate_tokens
 			tokenURL: 'https://appleid.apple.com/auth/token',
-			scope: ['email', 'name'].join(' '), // must be null, otherwise, response_mode must be form_post and break the oauth2 flow
 			// https://developer.apple.com/documentation/sign_in_with_apple/generate_and_validate_tokens#3262048
 			clientSecret: '',
 			...childConfig,
 		}, {
-			responseType: 'code id_token', // 'code' or 'code id_token'
 			ignoreGrantType: false,
 			tokenRequestMethod: TokenRequestMethod.POST,
 			includeStateInAccessToken: false,
-			enablePKCE: false,
-			addNonceToAuthorizeURL: true,
-			// https://developer.apple.com/documentation/sign_in_with_apple/sign_in_with_apple_js/incorporating_sign_in_with_apple_into_other_platforms#3332113
-			consentAdditionalParams: {response_mode: 'form_post'} // query or form_post or fragment
 		})
 	}
 

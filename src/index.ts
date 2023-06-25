@@ -1,31 +1,31 @@
-import FacebookAuthenticator from './vendors/FacebookAuthenticator'
-import FoursquareAuthenticator from './vendors/FoursquareAuthenticator'
-import GithubAuthenticator from './vendors/GithubAuthenticator'
-import GoogleAuthenticator from './vendors/GoogleAuthenticator'
-import InstagramAuthenticator from './vendors/InstagramAuthenticator'
-import LinkedInAuthenticator from './vendors/LinkedInAuthenticator'
-import PinterestAuthenticator from './vendors/PinterestAuthenticator'
-import TumblrAuthenticator from './vendors/TumblrAuthenticator'
-import TwitterAuthenticator from './vendors/TwitterAuthenticator'
-import LineAuthenticator from './vendors/LineAuthenticator'
-import ZaloAuthenticator from './vendors/ZaloAuthenticator'
-import AppleAuthenticator from './vendors/AppleAuthenticator'
-import OAuth from './oauth/OAuth'
-import OAuth2 from './oauth2/OAuth2'
+import {getGoogleConsentUrl, getGoogleAccessToken, fetchGoogleProfile, refreshGoogleAccessToken} from './vendors/google'
+import {getFacebookConsentUrl, getFacebookAccessToken, fetchFacebookProfile} from './vendors/facebook'
+import {getAppleConsentUrl} from './vendors/apple'
+import {getGithubConsentUrl, getGithubAccessToken, fetchGithubProfile} from './vendors/github'
+import {getFoursquareConsentUrl, getFoursquareAccessToken, fetchFoursquareProfile} from './vendors/foursquare'
+import {getInstagramConsentUrl, getInstagramAccessToken, fetchInstagramProfile} from './vendors/instagram'
+import {getLineConsentUrl, getLineAccessToken, fetchLineProfile, refreshLineAccessToken} from './vendors/line'
+import {getLinkedInConsentUrl, getLinkedInAccessToken, fetchLinkedInProfile} from './vendors/linkedIn'
+import {getTwitterConsentUrl, getTwitterAccessToken, fetchTwitterProfile} from './vendors/twitter'
+import {getTumblrConsentUrl, getTumblrAccessToken, fetchTumblrProfile} from './vendors/tumblr'
+import {getZaloConsentUrl, getZaloAccessToken, fetchZaloProfile, refreshZaloAccessToken} from './vendors/zalo'
+import {getPinterestConsentUrl, getPinterestAccessToken, fetchPinterestProfile} from './vendors/pinterest'
+import {getConsentUrl, getAccessToken} from './lib/oauth'
+import {getOauth1ConsentUrl, getOAuth1AccessToken, oauth1SignAndFetch} from './lib/oauth1'
 
 export {
-	FacebookAuthenticator,
-	FoursquareAuthenticator,
-	GithubAuthenticator,
-	GoogleAuthenticator,
-	InstagramAuthenticator,
-	LinkedInAuthenticator,
-	PinterestAuthenticator,
-	TumblrAuthenticator,
-	TwitterAuthenticator,
-	LineAuthenticator,
-	ZaloAuthenticator,
-	AppleAuthenticator,
-	OAuth2,
-	OAuth
+	getGoogleConsentUrl, getGoogleAccessToken, fetchGoogleProfile, refreshGoogleAccessToken,
+	getFacebookConsentUrl, getFacebookAccessToken, fetchFacebookProfile,
+	getAppleConsentUrl,
+	getGithubConsentUrl, getGithubAccessToken, fetchGithubProfile,
+	getFoursquareConsentUrl, getFoursquareAccessToken, fetchFoursquareProfile,
+	getInstagramConsentUrl, getInstagramAccessToken, fetchInstagramProfile,
+	getLineConsentUrl, getLineAccessToken, fetchLineProfile, refreshLineAccessToken,
+	getLinkedInConsentUrl, getLinkedInAccessToken, fetchLinkedInProfile,
+	getTwitterConsentUrl, getTwitterAccessToken, fetchTwitterProfile,
+	getTumblrConsentUrl, getTumblrAccessToken, fetchTumblrProfile,
+	getZaloConsentUrl, getZaloAccessToken, fetchZaloProfile, refreshZaloAccessToken,
+	getPinterestConsentUrl, getPinterestAccessToken, fetchPinterestProfile,
+	getConsentUrl, getAccessToken,
+	getOauth1ConsentUrl, getOAuth1AccessToken, oauth1SignAndFetch,
 }
