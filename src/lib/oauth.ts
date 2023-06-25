@@ -39,6 +39,7 @@ export const getConsentUrl = async (
 		responseType = 'code',
 		enablePKCE,
 		additionalParams,
+		state,
 	}: {
 		clientID: string,
 		redirectUri: string
@@ -51,8 +52,9 @@ export const getConsentUrl = async (
 		responseType?: string // default: 'code'
 		additionalParams?: Record<string, string>
 		addNonce?: boolean
+		state?: string // allow overwriting state
 	}) => {
-	const state = randomUUID()
+	state ??= randomUUID()
 	// https://datatracker.ietf.org/doc/html/rfc7636#section-4.1
 	// rfc7636 requires key length between 43-128
 	// while v4's generated key has 36 char
