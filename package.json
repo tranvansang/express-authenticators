@@ -4,7 +4,7 @@
 	"description": "Third party authenticators in nodejs. Support various providers. Almost zero dependencies.",
 	"main": "lib/index.js",
 	"repository": "github:tranvansang/express-authenticators",
-	"author": "Tran Sang <me@transa.ng>",
+	"author": "Sang Tran <t@sang.jp>",
 	"license": "MIT",
 	"keywords": [
 		"passport",
